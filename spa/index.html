@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Activity Feed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Russo+One&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Chakra Petch', sans-serif; }
+        h1, h2, h3 { font-family: 'Russo One', sans-serif; }
+        .gaming-bg { background: linear-gradient(-45deg, #0F0F23, #1a1a3a, #0F0F23, #1a1a3a); background-size: 400% 400%; animation: gradient-shift 15s ease infinite; }
+        .gaming-card { background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(30, 30, 50, 0.95) 100%); border: 1px solid rgba(124, 58, 237, 0.3); }
+        .gaming-btn { background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%); }
+        .gaming-btn-cta { background: linear-gradient(135deg, #F43F5E 0%, #FB7185 100%); }
+        .gaming-input { background: rgba(15, 15, 35, 0.8); border: 1px solid rgba(124, 58, 237, 0.3); color: #E2E8F0; }
+        .feed-row { transition: all 0.2s ease; }
+        .feed-row:hover { background: rgba(124, 58, 237, 0.08); }
+        .neon-glow { text-shadow: 0 0 10px rgba(124, 58, 237, 0.8); }
+        @keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    </style>
+</head>
+<body class="gaming-bg text-slate-100 min-h-screen">
+    <div id="auth-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
+        <div id="login-form" class="w-full max-w-md">
+            <div class="gaming-card rounded-2xl p-8">
+                <h1 class="text-3xl text-center mb-2 neon-glow text-purple-400">Welcome Back</h1>
+                <p class="text-center text-slate-400 mb-8">Sign in to publish events</p>
+                <form id="login-form-element" class="space-y-6">
+                    <input type="text" id="login-username" required class="gaming-input w-full px-4 py-3 rounded-lg" placeholder="Username">
+                    <input type="password" id="login-password" required class="gaming-input w-full px-4 py-3 rounded-lg" placeholder="Password">
+                    <div id="login-error" class="hidden text-sm text-red-400"></div>
+                    <button type="submit" class="gaming-btn w-full text-white font-semibold py-3 px-4 rounded-lg">Sign In</button>
+                </form>
+                <button id="auth-back-to-feed" class="gaming-btn w-full text-white font-semibold py-3 px-4 rounded-lg mt-6">Back to Feed</button>
+                <p class="mt-6 text-center text-sm text-slate-400">Don't have an account? <button id="show-register" class="text-purple-400">Sign up</button></p>
+            </div>
+        </div>
+        <div id="register-form" class="hidden w-full max-w-md">
+            <div class="gaming-card rounded-2xl p-8">
+                <h1 class="text-3xl text-center mb-2 neon-glow text-purple-400">Create Account</h1>
+                <p class="text-center text-slate-400 mb-8">Sign up to publish events</p>
+                <form id="register-form-element" class="space-y-6">
+                    <input type="text" id="register-username" required minlength="3" maxlength="50" class="gaming-input w-full px-4 py-3 rounded-lg" placeholder="Username">
+                    <input type="email" id="register-email" required class="gaming-input w-full px-4 py-3 rounded-lg" placeholder="Email">
+                    <input type="password" id="register-password" required minlength="6" class="gaming-input w-full px-4 py-3 rounded-lg" placeholder="Password">
+                    <div id="register-error" class="hidden text-sm text-red-400"></div>
+                    <button type="submit" class="gaming-btn w-full text-white font-semibold py-3 px-4 rounded-lg">Sign Up</button>
+                </form>
+                <button id="auth-back-to-feed-register" class="gaming-btn w-full text-white font-semibold py-3 px-4 rounded-lg mt-6">Back to Feed</button>
+                <p class="mt-6 text-center text-sm text-slate-400">Already have an account? <button id="show-login" class="text-purple-400">Sign in</button></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="feed-container" class="min-h-screen">
+        <header class="gaming-card border-b border-purple-500/30 sticky top-0 z-50 backdrop-blur-sm bg-slate-900/80">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <h1 class="text-2xl neon-glow text-purple-400">Real-Time Activity Feed</h1>
+                <div class="flex items-center gap-4">
+                    <div id="connection-status" class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span class="text-sm text-slate-300">Live</span>
+                    </div>
+                    <div id="user-dropdown" class="hidden relative">
+                        <a href="#" id="profile-link" class="flex items-center gap-2 text-sm text-slate-300">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold"><span id="user-avatar-text"></span></div>
+                            <span id="user-name"></span>
+                        </a>
+                        <button id="logout-btn" class="ml-3 text-sm text-red-300">Log out</button>
+                        <div class="hidden">
+                            <span id="dropdown-user-name"></span>
+                            <span id="dropdown-user-email"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            <div id="event-publisher-card" class="hidden gaming-card rounded-2xl p-6 mb-8">
+                <h2 class="text-xl mb-4 neon-glow text-purple-400">Publish A New Event</h2>
+                <form id="feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
+                    <input type="text" id="event-type-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="event type">
+                    <input type="text" id="event-content-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
+                    <button type="submit" class="gaming-btn gaming-btn-cta text-white font-semibold py-3 px-6 rounded-lg">Publish Event</button>
+                </form>
+                <div id="event-error" class="hidden mt-4 text-sm text-red-400"></div>
+                <div id="event-success" class="hidden mt-4 text-sm text-green-400"></div>
+            </div>
+
+            <div id="event-publisher-prompt" class="gaming-card rounded-2xl p-6 mb-8">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl mb-2 neon-glow text-purple-400">Want to publish events?</h2>
+                        <p class="text-slate-400">Sign in to post new events to the shared feed.</p>
+                    </div>
+                    <button id="publish-event-btn" class="gaming-btn text-white font-semibold py-3 px-6 rounded-lg">Sign In</button>
+                </div>
+            </div>
+
+            <div class="gaming-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl neon-glow text-purple-400">Latest Feed</h2>
+                        <p class="text-sm text-slate-400">Recent actions and notifications across the system</p>
+                    </div>
+                    <select id="feed-limit" class="gaming-input text-sm rounded-lg px-3 py-1.5">
+                        <option value="5">Last 5</option>
+                        <option value="10" selected>Last 10</option>
+                        <option value="50">Last 50</option>
+                        <option value="100">Last 100</option>
+                    </select>
+                </div>
+                <div id="feed-loading" class="text-center py-12">
+                    <p class="mt-4 text-slate-400">Loading activity feed...</p>
+                </div>
+                <div id="feed-empty" class="hidden text-center py-12">
+                    <p class="text-slate-400">No events yet. Publish the first event.</p>
+                </div>
+                <div id="feed-content" class="hidden overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-purple-500/30">
+                                <th class="text-left py-3 px-4 text-sm font-semibold text-purple-400">Time</th>
+                                <th class="text-left py-3 px-4 text-sm font-semibold text-purple-400">User</th>
+                                <th class="text-left py-3 px-4 text-sm font-semibold text-purple-400">Type</th>
+                                <th class="text-left py-3 px-4 text-sm font-semibold text-purple-400">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feed-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="not-found-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="text-center gaming-card p-12 rounded-2xl">
+            <h1 class="text-6xl text-pink-400 mb-4">404</h1>
+            <p class="text-slate-400 mb-8">The page you're looking for doesn't exist.</p>
+            <button id="go-home-btn" class="gaming-btn text-white font-semibold py-3 px-6 rounded-lg">Go to Home</button>
+        </div>
+    </div>
+
+    <div id="profile-container" class="hidden min-h-screen">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <div class="gaming-card rounded-2xl p-8 mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-3xl neon-glow text-purple-400">Profile</h1>
+                    <button id="profile-back-btn" class="gaming-btn text-white font-semibold py-2 px-4 rounded-lg">Back to Feed</button>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-6 pb-6 border-b border-purple-500/30">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-3xl"><span id="profile-avatar-text"></span></div>
+                        <div>
+                            <h2 class="text-2xl text-slate-200 mb-1" id="profile-username">-</h2>
+                            <p class="text-slate-400" id="profile-email">-</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="gaming-card rounded-lg p-4 border border-purple-500/30"><div class="text-sm text-slate-400 mb-1">Latest Event Type</div><div class="text-xl text-purple-400" id="profile-latest-event-type">-</div></div>
+                        <div class="gaming-card rounded-lg p-4 border border-purple-500/30"><div class="text-sm text-slate-400 mb-1">Latest Event Time</div><div class="text-xl text-purple-400" id="profile-latest-event-time">-</div></div>
+                        <div class="gaming-card rounded-lg p-4 border border-purple-500/30"><div class="text-sm text-slate-400 mb-1">Your Events</div><div class="text-xl text-purple-400" id="profile-total-events">0</div></div>
+                    </div>
+                    <div class="gaming-card rounded-lg p-6 border border-purple-500/30">
+                        <h3 class="text-xl text-purple-400 mb-4">Publish Another Event</h3>
+                        <form id="profile-feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
+                            <input type="text" id="profile-event-type-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="event type">
+                            <input type="text" id="profile-event-content-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
+                            <button type="submit" class="gaming-btn gaming-btn-cta text-white font-semibold py-3 px-6 rounded-lg">Publish Event</button>
+                        </form>
+                        <div id="profile-event-error" class="hidden mt-4 text-sm text-red-400"></div>
+                        <div id="profile-event-success" class="hidden mt-4 text-sm text-green-400"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/token-utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/feed.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
