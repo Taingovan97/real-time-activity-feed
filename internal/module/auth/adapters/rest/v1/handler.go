@@ -1,0 +1,161 @@
+// Package v1 provides REST API v1 handlers for the auth module.
+package v1
+
+import (
+	"real-time-activity-feed/internal/module/auth/application"
+	"real-time-activity-feed/internal/shared/logger"
+	"real-time-activity-feed/internal/shared/middleware"
+	"real-time-activity-feed/internal/shared/response"
+	"real-time-activity-feed/internal/shared/validator"
+
+	"github.com/gin-gonic/gin"
+)
+
+// Handler handles HTTP requests for authentication
+type Handler struct {
+	authUseCase application.AuthUseCase
+	logger      *logger.Logger
+}
+
+// NewHandler creates a new auth HTTP handler
+func NewHandler(authUseCase application.AuthUseCase, l *logger.Logger) *Handler {
+	return &Handler{
+		authUseCase: authUseCase,
+		logger:      l,
+	}
+}
+
+// Register handles user registration
+func (h *Handler) Register(c *gin.Context) {
+	var req application.RegisterRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		valErr := validator.Validate(req)
+		apiErr := toAPIError(valErr)
+		h.logger.Err(c.Request.Context(), valErr).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	if err := validator.Validate(req); err != nil {
+		apiErr := toAPIError(err)
+		h.logger.Err(c.Request.Context(), err).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	user, tokenPair, err := h.authUseCase.Register(c.Request.Context(), req)
+	if err != nil {
+		apiErr := toAPIError(err)
+		h.logger.Err(c.Request.Context(), err).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	response.Created(c, gin.H{
+		"user":  user,
+		"token": tokenPair,
+	}, "User registered successfully")
+}
+
+// Login handles user login
+func (h *Handler) Login(c *gin.Context) {
+	var req application.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		valErr := validator.Validate(req)
+		apiErr := toAPIError(valErr)
+		h.logger.Err(c.Request.Context(), valErr).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	if err := validator.Validate(req); err != nil {
+		apiErr := toAPIError(err)
+		h.logger.Err(c.Request.Context(), err).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	user, tokenPair, err := h.authUseCase.Login(c.Request.Context(), req)
+	if err != nil {
+		apiErr := toAPIError(err)
+		h.logger.Err(c.Request.Context(), err).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"user":  user,
+		"token": tokenPair,
+	}, "Login successful")
+}
+
+// RefreshToken handles token refresh
+func (h *Handler) RefreshToken(c *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token" validate:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		valErr := validator.Validate(req)
+		apiErr := toAPIError(valErr)
+		h.logger.Err(c.Request.Context(), valErr).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	if err := validator.Validate(req); err != nil {
+		apiErr := toAPIError(err)
+		h.logger.Err(c.Request.Context(), err).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	tokenPair, err := h.authUseCase.RefreshToken(c.Request.Context(), req.RefreshToken)
+	if err != nil {
+		apiErr := toAPIError(err)
+		h.logger.Err(c.Request.Context(), err).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	response.Success(c, gin.H{"token": tokenPair}, "Token refreshed successfully")
+}
+
+// GetCurrentUser returns the current authenticated user's information
+func (h *Handler) GetCurrentUser(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		apiErr := response.NewUnauthorizedError("User ID not found in context")
+		h.logger.Error(c.Request.Context(), apiErr.Error())
+		response.Error(c, apiErr)
+		return
+	}
+
+	user, err := h.authUseCase.GetCurrentUser(c.Request.Context(), userID)
+	if err != nil {
+		apiErr := toAPIError(err)
+		h.logger.Err(c.Request.Context(), err).Msg("Request error")
+		response.Error(c, apiErr)
+		return
+	}
+
+	response.Success(c, user, "User retrieved successfully")
+}
+
+// RegisterPublicRoutes registers public auth routes (no auth required)
+func (h *Handler) RegisterPublicRoutes(router *gin.RouterGroup) {
+	auth := router.Group("/auth")
+	{
+		auth.POST("/register", h.Register)
+		auth.POST("/login", h.Login)
+		auth.POST("/refresh", h.RefreshToken)
+	}
+}
+
+// RegisterProtectedRoutes registers protected auth routes (requires authentication)
+func (h *Handler) RegisterProtectedRoutes(router *gin.RouterGroup) {
+	auth := router.Group("/auth")
+	{
+		auth.GET("/me", h.GetCurrentUser)
+	}
+}
