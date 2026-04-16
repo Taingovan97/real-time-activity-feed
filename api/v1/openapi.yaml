@@ -90,7 +90,7 @@ paths:
   /feed:
     get:
       tags: [feed]
-      summary: Get the activity feed with pagination and optional event-type filtering
+      summary: Get the activity feed with pagination, event-type filtering, and text search
       parameters:
         - name: limit
           in: query
@@ -110,6 +110,11 @@ paths:
           schema:
             type: string
             enum: [login, upload, comment, notification, report, task, message, sync, status, approval]
+        - name: query
+          in: query
+          schema:
+            type: string
+            maxLength: 100
       responses:
         '200':
           description: Activity feed retrieved successfully

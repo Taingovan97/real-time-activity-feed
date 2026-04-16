@@ -7,4 +7,3 @@ CREATE TABLE IF NOT EXISTS activity_feed_events (
 );
 
 CREATE INDEX idx_activity_feed_events_user_id ON activity_feed_events(user_id);
-CREATE INDEX idx_activity_feed_events_created_at_desc ON activity_feed_events(created_at DESC);

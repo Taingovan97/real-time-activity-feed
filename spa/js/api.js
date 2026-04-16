@@ -128,13 +128,16 @@ class API {
         });
     }
 
-    async getFeed(limit = 10, offset = 0, eventType = '') {
+    async getFeed(limit = 10, offset = 0, eventType = '', query = '') {
         const params = new URLSearchParams({
             limit: String(limit),
             offset: String(offset),
         });
         if (eventType) {
             params.set('event_type', eventType);
+        }
+        if (query) {
+            params.set('query', query);
         }
         return this.request(`/feed?${params.toString()}`, { method: 'GET' });
     }

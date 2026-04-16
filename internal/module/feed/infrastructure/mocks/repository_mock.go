@@ -96,9 +96,9 @@ func (mr *MockFeedRepositoryMockRecorder) CreateEvent(ctx, entry any) *gomock.Ca
 }
 
 // GetFeed mocks base method.
-func (m *MockFeedRepository) GetFeed(ctx context.Context, eventType string, limit, offset int64) ([]domain.FeedEvent, int64, error) {
+func (m *MockFeedRepository) GetFeed(ctx context.Context, eventType, query string, limit, offset int64) ([]domain.FeedEvent, int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFeed", ctx, eventType, limit, offset)
+	ret := m.ctrl.Call(m, "GetFeed", ctx, eventType, query, limit, offset)
 	ret0, _ := ret[0].([]domain.FeedEvent)
 	ret1, _ := ret[1].(int64)
 	ret2, _ := ret[2].(error)
@@ -106,7 +106,7 @@ func (m *MockFeedRepository) GetFeed(ctx context.Context, eventType string, limi
 }
 
 // GetFeed indicates an expected call of GetFeed.
-func (mr *MockFeedRepositoryMockRecorder) GetFeed(ctx, eventType, limit, offset any) *gomock.Call {
+func (mr *MockFeedRepositoryMockRecorder) GetFeed(ctx, eventType, query, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeed", reflect.TypeOf((*MockFeedRepository)(nil).GetFeed), ctx, eventType, limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeed", reflect.TypeOf((*MockFeedRepository)(nil).GetFeed), ctx, eventType, query, limit, offset)
 }

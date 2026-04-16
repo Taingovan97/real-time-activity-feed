@@ -8,7 +8,7 @@ The Real-Time Activity Feed System is a web application that enables:
 
 - **User Authentication**: Users can register, login, and manage their accounts with JWT-based authentication
 - **event Management**: Authenticated users can publish events to the shared feed
-- **Activity Feed Display**: View paginated feeds showing recent events in newest-first order, with event-type filtering
+- **Activity Feed Display**: View paginated feeds showing recent events in newest-first order, with event-type filtering and text search
 - **Real-Time Updates**: Live feed updates via WebSocket when events arrive
 - **Scalable Architecture**: Designed to support multiple server instances with distributed coordination
 

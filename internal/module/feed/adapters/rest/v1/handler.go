@@ -57,6 +57,7 @@ func NewFeedHandler(
 type feedQueryRequest struct {
 	request.Pagination
 	EventType string `form:"event_type"`
+	Query     string `form:"query" validate:"max=100"`
 }
 
 // GetFeed handles `GET /feed`.
@@ -82,6 +83,7 @@ func (h *FeedHandler) GetFeed(c *gin.Context) {
 	entries, total, err := h.feedUseCase.GetFeed(
 		c.Request.Context(),
 		query.EventType,
+		query.Query,
 		normalized.GetLimit(),
 		normalized.GetOffset(),
 	)

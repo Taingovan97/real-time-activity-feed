@@ -121,6 +121,13 @@
                         </select>
                     </div>
                 </div>
+                <form id="feed-search-form" class="flex flex-col gap-3 mb-6 sm:flex-row">
+                    <input id="feed-search-query" type="text" class="gaming-input flex-1 px-4 py-3 rounded-lg" placeholder="Search by user or message">
+                    <div class="flex gap-3">
+                        <button type="submit" class="gaming-btn text-white font-semibold py-3 px-5 rounded-lg">Search</button>
+                        <button type="button" id="feed-search-clear" class="gaming-btn text-white font-semibold py-3 px-5 rounded-lg">Clear</button>
+                    </div>
+                </form>
                 <div id="feed-loading" class="text-center py-12">
                     <p class="mt-4 text-slate-400">Loading activity feed...</p>
                 </div>

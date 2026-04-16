@@ -45,7 +45,7 @@ func (r *PostgresFeedRepository) CreateEvent(
 // GetFeed returns feed items ordered newest first.
 func (r *PostgresFeedRepository) GetFeed(
 	ctx context.Context,
-	eventType string,
+	eventType, query string,
 	limit, offset int64,
 ) ([]domain.FeedEvent, int64, error) {
 	queryBuilder := strings.Builder{}
@@ -63,9 +63,22 @@ func (r *PostgresFeedRepository) GetFeed(
 	`)
 
 	args := []any{}
+	conditions := make([]string, 0, 2)
 	if eventType != "" {
-		queryBuilder.WriteString("\n\t\tWHERE e.event_type = $1")
+		conditions = append(conditions, fmt.Sprintf("e.event_type = $%d", len(args)+1))
 		args = append(args, eventType)
+	}
+	if query != "" {
+		searchPattern := "%" + query + "%"
+		conditions = append(
+			conditions,
+			fmt.Sprintf("(e.content ILIKE $%d OR u.username ILIKE $%d)", len(args)+1, len(args)+2),
+		)
+		args = append(args, searchPattern, searchPattern)
+	}
+	if len(conditions) > 0 {
+		queryBuilder.WriteString("\n\t\tWHERE ")
+		queryBuilder.WriteString(strings.Join(conditions, "\n\t\tAND "))
 	}
 
 	queryBuilder.WriteString("\n\t\tORDER BY e.created_at DESC, e.id DESC")

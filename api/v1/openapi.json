@@ -371,6 +371,14 @@
               ],
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -403,7 +411,7 @@
             "description": "Activity feed retrieved successfully"
           }
         },
-        "summary": "Get the activity feed with pagination and optional event-type filtering",
+        "summary": "Get the activity feed with pagination, event-type filtering, and text search",
         "tags": [
           "feed"
         ]

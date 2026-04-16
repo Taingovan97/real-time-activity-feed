@@ -7,14 +7,16 @@ class FeedManager {
         this.entries = [];
         this.limit = 10;
         this.eventTypeFilter = '';
+        this.searchQuery = '';
     }
 
-    async loadInitialFeed(limit = 10, eventType = this.eventTypeFilter) {
+    async loadInitialFeed(limit = 10, eventType = this.eventTypeFilter, query = this.searchQuery) {
         try {
-            const response = await api.getFeed(limit, 0, eventType);
+            const response = await api.getFeed(limit, 0, eventType, query);
             if (response.success) {
                 this.limit = limit;
                 this.eventTypeFilter = eventType;
+                this.searchQuery = query;
                 this.entries = Array.isArray(response.data) ? response.data : [];
                 this.total = response.meta?.total || this.entries.length;
                 this.renderFeed();
@@ -24,8 +26,8 @@ class FeedManager {
         }
     }
 
-    async connect(limit = 10, eventType = '') {
-        await this.loadInitialFeed(limit, eventType);
+    async connect(limit = 10, eventType = '', query = '') {
+        await this.loadInitialFeed(limit, eventType, query);
         this.shouldReconnect = true;
         this.openSocket();
     }
@@ -44,12 +46,17 @@ class FeedManager {
 
     async updateLimit(limit) {
         this.limit = limit;
-        await this.loadInitialFeed(limit, this.eventTypeFilter);
+        await this.loadInitialFeed(limit, this.eventTypeFilter, this.searchQuery);
     }
 
     async updateEventTypeFilter(eventType) {
         this.eventTypeFilter = eventType;
-        await this.loadInitialFeed(this.limit, eventType);
+        await this.loadInitialFeed(this.limit, eventType, this.searchQuery);
+    }
+
+    async updateSearchQuery(query) {
+        this.searchQuery = query;
+        await this.loadInitialFeed(this.limit, this.eventTypeFilter, query);
     }
 
     dedupeByID(entries) {
@@ -83,6 +90,12 @@ class FeedManager {
                 if (payload.success && payload.data) {
                     if (this.eventTypeFilter && payload.data.event_type !== this.eventTypeFilter) {
                         return;
+                    }
+                    if (this.searchQuery) {
+                        const haystack = `${payload.data.username || ''} ${payload.data.content || ''}`.toLowerCase();
+                        if (!haystack.includes(this.searchQuery.toLowerCase())) {
+                            return;
+                        }
                     }
                     this.entries.unshift(payload.data);
                     this.entries = this.dedupeByID(this.entries).slice(0, Math.max(this.limit, 100));

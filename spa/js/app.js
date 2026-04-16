@@ -16,7 +16,11 @@ class App {
         if (filterSelector) {
             filterSelector.value = this.getEventTypeFilter();
         }
-        feedManager.connect(this.getFeedLimit(), this.getEventTypeFilter());
+        const searchInput = document.getElementById('feed-search-query');
+        if (searchInput) {
+            searchInput.value = this.getSearchQuery();
+        }
+        feedManager.connect(this.getFeedLimit(), this.getEventTypeFilter(), this.getSearchQuery());
         this.updateAuthUI();
     }
 
@@ -46,6 +50,21 @@ class App {
             const eventType = e.target.value;
             this.setEventTypeFilter(eventType);
             await feedManager.updateEventTypeFilter(eventType);
+        });
+        document.getElementById('feed-search-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const searchInput = document.getElementById('feed-search-query');
+            const query = searchInput?.value.trim() || '';
+            this.setSearchQuery(query);
+            await feedManager.updateSearchQuery(query);
+        });
+        document.getElementById('feed-search-clear')?.addEventListener('click', async () => {
+            const searchInput = document.getElementById('feed-search-query');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            this.setSearchQuery('');
+            await feedManager.updateSearchQuery('');
         });
     }
 
@@ -147,7 +166,7 @@ class App {
             successDiv.classList.remove('hidden');
             typeInput.value = '';
             contentInput.value = '';
-            await feedManager.loadInitialFeed(this.getFeedLimit(), this.getEventTypeFilter());
+            await feedManager.loadInitialFeed(this.getFeedLimit(), this.getEventTypeFilter(), this.getSearchQuery());
             if (profileMode) {
                 await this.loadProfileData();
             }
@@ -187,6 +206,14 @@ class App {
 
     setEventTypeFilter(eventType) {
         localStorage.setItem('feedEventTypeFilter', eventType);
+    }
+
+    getSearchQuery() {
+        return localStorage.getItem('feedSearchQuery') || '';
+    }
+
+    setSearchQuery(query) {
+        localStorage.setItem('feedSearchQuery', query);
     }
 
     async loadEventTypes() {
