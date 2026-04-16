@@ -18,38 +18,36 @@ func TestFeedUseCase_GetFeed_FromCache(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	cache := mocks.NewMockFeedCacheRepository(ctrl)
 	persistence := mocks.NewMockFeedRepository(ctrl)
 	broadcast := mocks.NewMockBroadcastService(ctrl)
 	users := mocks.NewMockUserRepository(ctrl)
 
-	cache.EXPECT().GetFeed(ctx, int64(10), int64(0)).Return([]domain.FeedEvent{{ID: "evt-1"}}, int64(1), nil)
+	persisted := []domain.FeedEvent{{ID: "evt-1"}}
+	persistence.EXPECT().GetFeed(ctx, int64(10), int64(0)).Return(persisted, int64(1), nil)
 
-	uc := NewFeedUseCase(cache, persistence, users, broadcast, logger.New("info", false))
+	uc := NewFeedUseCase(persistence, users, broadcast, logger.New("info", false))
 	entries, total, err := uc.GetFeed(ctx, 10, 0)
 
 	require.NoError(t, err)
-	require.Len(t, entries, 1)
+	require.Equal(t, persisted, entries)
 	require.Equal(t, int64(1), total)
 }
 
-func TestFeedUseCase_GetFeed_FallbackToPersistence(t *testing.T) {
+func TestFeedUseCase_GetFeed_WhenPersistenceFails(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	cache := mocks.NewMockFeedCacheRepository(ctrl)
 	persistence := mocks.NewMockFeedRepository(ctrl)
 	broadcast := mocks.NewMockBroadcastService(ctrl)
 	users := mocks.NewMockUserRepository(ctrl)
 
-	cache.EXPECT().GetFeed(ctx, int64(10), int64(0)).Return(nil, int64(0), errors.New("redis down"))
-	persistence.EXPECT().GetFeed(ctx, int64(10), int64(0)).Return([]domain.FeedEvent{{ID: "evt-1"}}, int64(1), nil)
+	persistence.EXPECT().GetFeed(ctx, int64(10), int64(0)).Return(nil, int64(0), errors.New("db down"))
 
-	uc := NewFeedUseCase(cache, persistence, users, broadcast, logger.New("info", false))
+	uc := NewFeedUseCase(persistence, users, broadcast, logger.New("info", false))
 	entries, total, err := uc.GetFeed(ctx, 10, 0)
 
-	require.NoError(t, err)
-	require.Len(t, entries, 1)
-	require.Equal(t, int64(1), total)
+	require.Error(t, err)
+	require.Nil(t, entries)
+	require.Zero(t, total)
 }

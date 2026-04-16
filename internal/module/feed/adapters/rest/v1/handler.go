@@ -2,12 +2,12 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
+	"net/http"
 	"time"
 
 	"real-time-activity-feed/internal/module/feed/application"
-	"real-time-activity-feed/internal/module/feed/domain"
 	"real-time-activity-feed/internal/shared/logger"
 	"real-time-activity-feed/internal/shared/middleware"
 	"real-time-activity-feed/internal/shared/request"
@@ -15,9 +15,23 @@ import (
 	"real-time-activity-feed/internal/shared/validator"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
-const keepAliveInterval = 15 * time.Second
+const (
+	websocketPingInterval = 30 * time.Second
+	websocketWriteWait    = 10 * time.Second
+	websocketPongWait     = 60 * time.Second
+	maxMessageSize        = 1024
+)
+
+var feedUpgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(_ *http.Request) bool {
+		return true
+	},
+}
 
 // FeedHandler exposes the activity feed API while preserving the existing module package.
 type FeedHandler struct {
@@ -65,28 +79,47 @@ func (h *FeedHandler) GetFeed(c *gin.Context) {
 	response.SuccessWithMeta(c, entries, "Activity feed retrieved successfully", meta)
 }
 
-// StreamFeed handles `GET /feed/stream` using SSE.
+// StreamFeed handles `GET /feed/ws` using WebSocket.
 func (h *FeedHandler) StreamFeed(c *gin.Context) {
-	c.Header("Content-Type", "text/event-stream")
-	c.Header("Cache-Control", "no-cache")
-	c.Header("Connection", "keep-alive")
-	c.Header("X-Accel-Buffering", "no")
+	ctx, cancel := context.WithCancel(c.Request.Context())
+	defer cancel()
 
-	ctx := c.Request.Context()
 	updateCh, err := h.feedUseCase.SubscribeToFeedEvents(ctx)
 	if err != nil {
-		closedCh := make(chan *domain.FeedEvent)
-		close(closedCh)
-		updateCh = closedCh
+		response.Error(c, response.NewInternalError("Unable to connect live feed"))
+		return
 	}
 
-	ticker := time.NewTicker(keepAliveInterval)
+	conn, err := feedUpgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		h.logger.Warnf(ctx, "Failed to upgrade feed WebSocket connection: %v", err)
+		return
+	}
+	defer func() {
+		_ = conn.Close()
+	}()
+
+	conn.SetReadLimit(maxMessageSize)
+	_ = conn.SetReadDeadline(time.Now().Add(websocketPongWait))
+	conn.SetPongHandler(func(string) error {
+		return conn.SetReadDeadline(time.Now().Add(websocketPongWait))
+	})
+
+	go func() {
+		defer cancel()
+		for {
+			if _, _, readErr := conn.ReadMessage(); readErr != nil {
+				return
+			}
+		}
+	}()
+
+	ticker := time.NewTicker(websocketPingInterval)
 	defer ticker.Stop()
 
-	notify := c.Writer.CloseNotify()
 	for {
 		select {
-		case <-notify:
+		case <-ctx.Done():
 			return
 		case entry, ok := <-updateCh:
 			if !ok {
@@ -98,12 +131,25 @@ func (h *FeedHandler) StreamFeed(c *gin.Context) {
 				Data:    entry,
 				Message: "Feed event received",
 			}
-			messageBytes, _ := json.Marshal(resp)
-			_, _ = fmt.Fprintf(c.Writer, "data: %s\n\n", messageBytes)
-			c.Writer.Flush()
+			messageBytes, marshalErr := json.Marshal(resp)
+			if marshalErr != nil {
+				h.logger.Warnf(ctx, "Failed to marshal WebSocket feed event: %v", marshalErr)
+				continue
+			}
+			_ = conn.SetWriteDeadline(time.Now().Add(websocketWriteWait))
+			if writeErr := conn.WriteMessage(websocket.TextMessage, messageBytes); writeErr != nil {
+				h.logger.Warnf(ctx, "Failed to write WebSocket feed event: %v", writeErr)
+				return
+			}
 		case <-ticker.C:
-			_, _ = fmt.Fprintf(c.Writer, ": keep-alive\n\n")
-			c.Writer.Flush()
+			if pingErr := conn.WriteControl(
+				websocket.PingMessage,
+				[]byte("ping"),
+				time.Now().Add(websocketWriteWait),
+			); pingErr != nil {
+				h.logger.Warnf(ctx, "Failed to ping WebSocket client: %v", pingErr)
+				return
+			}
 		}
 	}
 }
@@ -142,7 +188,7 @@ func (h *FeedHandler) RegisterPublicRoutes(router *gin.RouterGroup) {
 	feed := router.Group("/feed")
 	{
 		feed.GET("", h.GetFeed)
-		feed.GET("/stream", h.StreamFeed)
+		feed.GET("/ws", h.StreamFeed)
 	}
 }
 

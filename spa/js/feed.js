@@ -1,6 +1,8 @@
 class FeedManager {
     constructor() {
-        this.eventSource = null;
+        this.socket = null;
+        this.reconnectTimer = null;
+        this.shouldReconnect = true;
         this.isConnected = false;
         this.entries = [];
         this.limit = 10;
@@ -22,38 +24,19 @@ class FeedManager {
 
     async connect(limit = 10) {
         await this.loadInitialFeed(limit);
-        if (this.eventSource) {
-            this.disconnect();
-        }
-
-        this.eventSource = new EventSource('/api/v1/feed/stream');
-        this.eventSource.onopen = () => {
-            this.isConnected = true;
-            this.updateConnectionStatus(true);
-        };
-        this.eventSource.onmessage = (event) => {
-            try {
-                const payload = JSON.parse(event.data);
-                if (payload.success && payload.data) {
-                    this.entries.unshift(payload.data);
-                    this.entries = this.dedupeByID(this.entries).slice(0, Math.max(this.limit, 100));
-                    this.total = Math.max(this.total || 0, this.entries.length);
-                    this.renderFeed();
-                }
-            } catch (error) {
-                console.error('Error parsing feed update:', error);
-            }
-        };
-        this.eventSource.onerror = () => {
-            this.isConnected = false;
-            this.updateConnectionStatus(false);
-        };
+        this.shouldReconnect = true;
+        this.openSocket();
     }
 
     disconnect() {
-        if (this.eventSource) {
-            this.eventSource.close();
-            this.eventSource = null;
+        this.shouldReconnect = false;
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
+        if (this.socket) {
+            this.socket.close();
+            this.socket = null;
         }
     }
 
@@ -71,6 +54,55 @@ class FeedManager {
             seen.add(entry.id);
             return true;
         });
+    }
+
+    openSocket() {
+        if (this.socket) {
+            this.socket.close();
+        }
+
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const url = `${protocol}//${window.location.host}/api/v1/feed/ws`;
+        this.socket = new WebSocket(url);
+
+        this.socket.onopen = () => {
+            this.isConnected = true;
+            this.updateConnectionStatus(true);
+        };
+
+        this.socket.onmessage = (event) => {
+            try {
+                const payload = JSON.parse(event.data);
+                if (payload.success && payload.data) {
+                    this.entries.unshift(payload.data);
+                    this.entries = this.dedupeByID(this.entries).slice(0, Math.max(this.limit, 100));
+                    this.total = Math.max(this.total || 0, this.entries.length);
+                    this.renderFeed();
+                }
+            } catch (error) {
+                console.error('Error parsing feed update:', error);
+            }
+        };
+
+        this.socket.onerror = () => {
+            this.isConnected = false;
+            this.updateConnectionStatus(false);
+        };
+
+        this.socket.onclose = () => {
+            this.socket = null;
+            this.isConnected = false;
+            this.updateConnectionStatus(false);
+
+            if (!this.shouldReconnect) {
+                return;
+            }
+
+            if (this.reconnectTimer) {
+                clearTimeout(this.reconnectTimer);
+            }
+            this.reconnectTimer = setTimeout(() => this.openSocket(), 3000);
+        };
     }
 
     updateConnectionStatus(connected) {

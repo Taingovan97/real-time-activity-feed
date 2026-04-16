@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Real-Time Activity Feed API
   version: "1.0"
-  description: Real-time activity feed system with REST API for event publishing and SSE for live feed updates
+  description: Real-time activity feed system with REST API for event publishing and WebSocket-based live feed updates
 
 servers:
   - url: /api/v1
@@ -147,19 +147,19 @@ paths:
                       data:
                         $ref: '#/components/schemas/FeedEvent'
 
-  /feed/stream:
+  /feed/ws:
     get:
       tags: [feed]
-      summary: Stream live activity feed updates
+      summary: Upgrade to a WebSocket for live activity feed updates
       responses:
-        '200':
-          description: SSE stream of feed events
+        '101':
+          description: WebSocket upgrade accepted. The server sends JSON messages matching the standard response envelope with a `FeedEvent` in `data`.
+        '500':
+          description: Live feed connection could not be established
           content:
-            text/event-stream:
+            application/json:
               schema:
-                type: string
-                example: |
-                  data: {"success":true,"data":{"id":"evt-1","user_id":"00000000-0000-0000-0000-000000000001","username":"alice","event_type":"notification","content":"Alice deployed version 1.2.0","created_at":"2026-04-13T09:00:00Z"},"message":"Feed event received"}
+                $ref: '#/components/schemas/Response'
 
 components:
   securitySchemes:

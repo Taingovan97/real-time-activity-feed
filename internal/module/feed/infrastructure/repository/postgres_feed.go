@@ -41,6 +41,18 @@ func (r *PostgresFeedRepository) CreateEvent(
 	return &created, nil
 }
 
+// CountFeed returns the total number of persisted feed events.
+func (r *PostgresFeedRepository) CountFeed(ctx context.Context) (int64, error) {
+	const query = `SELECT COUNT(*) FROM activity_feed_events`
+
+	var total int64
+	if err := r.pool.QueryRow(ctx, query).Scan(&total); err != nil {
+		return 0, fmt.Errorf("failed to count feed: %w", err)
+	}
+
+	return total, nil
+}
+
 // GetFeed returns feed items ordered newest first.
 func (r *PostgresFeedRepository) GetFeed(
 	ctx context.Context,

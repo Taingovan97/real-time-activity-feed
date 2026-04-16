@@ -68,10 +68,10 @@ func Load() (*Config, error) {
 		Server: ServerConfig{
 			Port: getEnv("SERVER_PORT", "8080"),
 			Host: getEnv("SERVER_HOST", "0.0.0.0"),
-			// Increased timeouts for SSE connections (Server-Sent Events)
-			// ReadTimeout: time to read request headers (SSE connections stay open)
+			// Increased timeouts for long-lived live-update connections.
+			// ReadTimeout: time to read request headers before a WebSocket upgrade.
 			ReadTimeout: getDurationEnv("SERVER_READ_TIMEOUT", 10*time.Minute),
-			// WriteTimeout: time to write response (SSE sends data over time)
+			// WriteTimeout: time to write HTTP responses and handshake data.
 			WriteTimeout: getDurationEnv("SERVER_WRITE_TIMEOUT", 10*time.Minute),
 			// IdleTimeout: time to keep idle connections open (cleanup dead connections)
 			IdleTimeout: getDurationEnv("SERVER_IDLE_TIMEOUT", 5*time.Minute),

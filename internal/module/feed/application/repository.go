@@ -1,6 +1,6 @@
 package application
 
-//go:generate mockgen -destination=../infrastructure/mocks/repository_mock.go -package=mocks real-time-activity-feed/internal/module/feed/application UserRepository,FeedRepository,FeedCacheRepository
+//go:generate mockgen -destination=../infrastructure/mocks/repository_mock.go -package=mocks real-time-activity-feed/internal/module/feed/application UserRepository,FeedRepository
 
 import (
 	"context"
@@ -16,11 +16,5 @@ type UserRepository interface {
 // FeedRepository stores feed events in PostgreSQL.
 type FeedRepository interface {
 	CreateEvent(ctx context.Context, entry domain.FeedEvent) (*domain.FeedEvent, error)
-	GetFeed(ctx context.Context, limit, offset int64) ([]domain.FeedEvent, int64, error)
-}
-
-// FeedCacheRepository stores and reads the recent feed cache from Redis.
-type FeedCacheRepository interface {
-	AddEvent(ctx context.Context, entry domain.FeedEvent) error
 	GetFeed(ctx context.Context, limit, offset int64) ([]domain.FeedEvent, int64, error)
 }

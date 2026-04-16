@@ -65,7 +65,6 @@ func main() {
 	jwtMgr := authJWT.NewManager(cfg.JWT.SecretKey, cfg.JWT.AccessExpiry, cfg.JWT.RefreshExpiry)
 
 	persistenceRepo := feedInfra.NewPostgresFeedRepository(db.Pool)
-	cacheRepo := feedInfra.NewRedisFeedRepository(redisClient.GetClient())
 	feedUserRepo := feedInfra.NewUserRepository(db.Pool)
 
 	// Initialize broadcast service (infrastructure layer)
@@ -75,12 +74,11 @@ func main() {
 	authUseCase := authApp.NewAuthUseCase(userRepo, jwtMgr, l)
 	eventPublisherUseCase := feedApp.NewEventPublisherUseCase(
 		persistenceRepo,
-		cacheRepo,
 		feedUserRepo,
 		broadcastService,
 		l,
 	)
-	feedUseCase := feedApp.NewFeedUseCase(cacheRepo, persistenceRepo, feedUserRepo, broadcastService, l)
+	feedUseCase := feedApp.NewFeedUseCase(persistenceRepo, feedUserRepo, broadcastService, l)
 
 	// Initialize handlers
 	authHandler := v1Auth.NewHandler(authUseCase, l)

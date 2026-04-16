@@ -18,7 +18,6 @@ type EventPublisherUseCase interface {
 
 type eventPublisherUseCase struct {
 	persistenceRepo  FeedRepository
-	cacheRepo        FeedCacheRepository
 	userRepo         UserRepository
 	broadcastService BroadcastService
 	logger           *logger.Logger
@@ -29,14 +28,12 @@ type eventPublisherUseCase struct {
 //nolint:revive // Returning the concrete type preserves the module's existing construction pattern.
 func NewEventPublisherUseCase(
 	persistenceRepo FeedRepository,
-	cacheRepo FeedCacheRepository,
 	userRepo UserRepository,
 	broadcastService BroadcastService,
 	l *logger.Logger,
 ) *eventPublisherUseCase {
 	return &eventPublisherUseCase{
 		persistenceRepo:  persistenceRepo,
-		cacheRepo:        cacheRepo,
 		userRepo:         userRepo,
 		broadcastService: broadcastService,
 		logger:           l,
@@ -67,10 +64,6 @@ func (uc *eventPublisherUseCase) PublishEvent(ctx context.Context, userID string
 	if err != nil {
 		uc.logger.Errorf(ctx, "Failed to persist feed event: %v", err)
 		return nil, fmt.Errorf("failed to publish event: %w", err)
-	}
-
-	if err := uc.cacheRepo.AddEvent(ctx, *created); err != nil {
-		uc.logger.Warnf(ctx, "Failed to cache feed event: %v", err)
 	}
 
 	if err := uc.broadcastService.BroadcastEvent(ctx, created); err != nil {

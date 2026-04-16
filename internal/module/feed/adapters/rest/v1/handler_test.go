@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
@@ -42,6 +44,45 @@ func TestFeedHandler_GetFeed(t *testing.T) {
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
 	require.True(t, body.Success)
 	require.Equal(t, "Activity feed retrieved successfully", body.Message)
+}
+
+func TestFeedHandler_StreamFeed_WebSocket(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFeed := mocks.NewMockFeedUseCase(ctrl)
+	mockEvents := mocks.NewMockEventPublisherUseCase(ctrl)
+	updates := make(chan *domain.FeedEvent, 1)
+	mockFeed.EXPECT().SubscribeToFeedEvents(gomock.Any()).DoAndReturn(
+		func(_ context.Context) (<-chan *domain.FeedEvent, error) {
+			return updates, nil
+		},
+	)
+
+	router := gin.New()
+	NewFeedHandler(mockFeed, mockEvents, logger.New("info", false)).RegisterPublicRoutes(&router.RouterGroup)
+	server := httptest.NewServer(router)
+	defer server.Close()
+
+	wsURL := "ws" + server.URL[len("http"):] + "/feed/ws"
+	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, conn.Close())
+	}()
+
+	updates <- &domain.FeedEvent{
+		ID: "evt-1", UserID: "user-1", Username: "alice", EventType: "login", Content: "signed in", CreatedAt: time.Now(),
+	}
+
+	_, message, err := conn.ReadMessage()
+	require.NoError(t, err)
+
+	var body response.Response
+	require.NoError(t, json.Unmarshal(message, &body))
+	require.True(t, body.Success)
+	require.Equal(t, "Feed event received", body.Message)
 }
 
 func TestFeedHandler_PublishEvent(t *testing.T) {

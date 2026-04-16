@@ -80,6 +80,21 @@ func (m *MockFeedRepository) EXPECT() *MockFeedRepositoryMockRecorder {
 	return m.recorder
 }
 
+// CountFeed mocks base method.
+func (m *MockFeedRepository) CountFeed(ctx context.Context) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountFeed", ctx)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountFeed indicates an expected call of CountFeed.
+func (mr *MockFeedRepositoryMockRecorder) CountFeed(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountFeed", reflect.TypeOf((*MockFeedRepository)(nil).CountFeed), ctx)
+}
+
 // CreateEvent mocks base method.
 func (m *MockFeedRepository) CreateEvent(ctx context.Context, entry domain.FeedEvent) (*domain.FeedEvent, error) {
 	m.ctrl.T.Helper()
@@ -163,4 +178,18 @@ func (m *MockFeedCacheRepository) GetFeed(ctx context.Context, limit, offset int
 func (mr *MockFeedCacheRepositoryMockRecorder) GetFeed(ctx, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeed", reflect.TypeOf((*MockFeedCacheRepository)(nil).GetFeed), ctx, limit, offset)
+}
+
+// ReplaceFeed mocks base method.
+func (m *MockFeedCacheRepository) ReplaceFeed(ctx context.Context, entries []domain.FeedEvent) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReplaceFeed", ctx, entries)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReplaceFeed indicates an expected call of ReplaceFeed.
+func (mr *MockFeedCacheRepositoryMockRecorder) ReplaceFeed(ctx, entries any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReplaceFeed", reflect.TypeOf((*MockFeedCacheRepository)(nil).ReplaceFeed), ctx, entries)
 }
