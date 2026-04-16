@@ -318,7 +318,7 @@ The Air configuration is automatically used when running `make start-dev` or `./
 - **Language**: Go 1.25.5
 - **Web Framework**: Gin
 - **Database**: PostgreSQL 15+
-- **Cache/Messaging**: Redis 7+ (recent-feed cache and pub/sub)
+- **Messaging**: Redis 7+ (pub/sub for live feed updates)
 - **Authentication**: JWT (github.com/golang-jwt/jwt/v5)
 - **Database Driver**: pgx/v5
 - **Redis Client**: go-redis/v9

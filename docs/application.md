@@ -9,7 +9,7 @@ The Real-Time Activity Feed System is a web application that enables:
 - **User Authentication**: Users can register, login, and manage their accounts with JWT-based authentication
 - **event Management**: Authenticated users can publish events to the shared feed
 - **Activity Feed Display**: View paginated feeds showing recent events in newest-first order
-- **Real-Time Updates**: Live feed updates via Server-Sent Events (SSE) when events arrive
+- **Real-Time Updates**: Live feed updates via WebSocket when events arrive
 - **Scalable Architecture**: Designed to support multiple server instances with distributed coordination
 
 ## System Components
@@ -25,7 +25,7 @@ The system consists of **2 main modules** and **shared infrastructure**:
 
 - **API Router** - HTTP request routing and middleware
 - **Database** - PostgreSQL for persistent data storage
-- **Cache** - Redis for high-performance caching and real-time messaging
+- **Messaging** - Redis for pub/sub fan-out of live feed updates
 - **Logger** - Centralized logging system
 - **Middleware** - Request processing, authentication, CORS, error handling
 
@@ -57,8 +57,8 @@ graph TB
 - **Client Applications** communicate with the system through the **API Router**
 - **API Router** routes requests to appropriate **Modules** based on the endpoint
 - **Auth Module** handles authentication and stores user data in the **Database**
-- **Feed Module** uses both **Database** (persistence) and **Cache** (performance) for data storage
-- **Broadcast Service** uses **Cache** for message distribution and sends updates to **Real-Time Clients**
+- **Feed Module** uses **Database** for feed history and **Messaging** for live update distribution
+- **Broadcast Service** uses **Messaging** for message distribution and sends updates to **Real-Time Clients**
 - All components use **Shared Middleware** and **Shared Logger** for common functionality
 
 For detailed module-specific flows and implementation details, see [Modules](./modules.md).

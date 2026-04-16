@@ -1,6 +1,6 @@
 # Real-Time Activity Feed System
 
-A high-performance, modular real-time activity feed system built with Go, following Clean Architecture principles. The system provides real-time event publishing and live feed updates via Server-Sent Events (SSE).
+A high-performance, modular real-time activity feed system built with Go, following Clean Architecture principles. The system provides real-time event publishing and live feed updates via WebSocket.
 
 ## Overview
 
@@ -8,7 +8,7 @@ This system enables users to:
 - **Authenticate** using JWT-based authentication with access and refresh tokens
 - **Publish events** into a shared activity feed
 - **View activity feed** with real-time updates as events arrive
-- **Experience low latency** through Redis caching and efficient data structures
+- **Experience low latency** through PostgreSQL-backed feed reads and Redis pub/sub fan-out
 
 The system is designed with **Clean Architecture** principles, making it:
 - **Modular**: Self-contained modules that can be extracted to microservices
@@ -19,8 +19,8 @@ The system is designed with **Clean Architecture** principles, making it:
 ## Features
 
 - JWT-based authentication with token refresh
-- Real-time feed updates via Server-Sent Events (SSE)
-- High-performance Redis caching with PostgreSQL persistence
+- Real-time feed updates via WebSocket
+- PostgreSQL persistence with Redis pub/sub for live fan-out
 - Modular Clean Architecture design
 - Microservice-ready modules
 

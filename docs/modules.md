@@ -106,26 +106,25 @@ The system implements JWT-based authentication with automatic token management:
 
 ## Feed Module
 
-**Purpose**: event publishing and real-time feed queries via Server-Sent Events (SSE)
+**Purpose**: event publishing and real-time feed queries via WebSocket
 
-**Data layer**: PostgreSQL = persistence; Redis = cache. All cache/persistence logic lives in use cases; handlers only invoke use cases.
+**Data layer**: PostgreSQL = persistence and feed history; Redis = pub/sub transport for live updates. Handlers only invoke use cases.
 
 **Components**:
 - **Domain**: `FeedEvent` (`domain/feed_event.go`), constants (`domain/constants.go`)
 - **Application**:
   - `FeedUseCase` - `GetFeed(limit, offset)`, `SubscribeToFeedEvents()`
-  - `eventUseCase` - `PublishEvent()` (persist to PostgreSQL, then best-effort cache and broadcast)
-  - Repository interfaces: `FeedRepository`, `FeedCacheRepository`, `UserRepository` (module-owned), `BroadcastService`
-- **Adapters**: HTTP handlers, error mapper
-- **Infrastructure**: PostgreSQL (persistence) and Redis (cache) repositories, Redis broadcast service
+  - `eventUseCase` - `PublishEvent()` (persist to PostgreSQL, then broadcast)
+  - Repository interfaces: `FeedRepository`, `UserRepository` (module-owned), `BroadcastService`
+- **Adapters**: HTTP handlers, WebSocket upgrade handler, error mapper
+- **Infrastructure**: PostgreSQL persistence and Redis broadcast service
 
 **Repository Interface Methods**:
-- `FeedCacheRepository.GetFeed(limit, offset)` - Returns paginated entries and total count in a single call
 - `FeedRepository.GetFeed(limit, offset)` - Returns paginated entries and total count (uses SQL LIMIT/OFFSET and COUNT(*) OVER())
 
 **Endpoints**:
-- `GET /api/v1/feed?limit=10&offset=0` - Paginated feed (cache-aside: cache first, PostgreSQL fallback)
-- `GET /api/v1/feed/stream` - SSE stream for entry deltas only (pubsub, no cache/persistence reads)
+- `GET /api/v1/feed?limit=10&offset=0` - Paginated feed from PostgreSQL
+- `GET /api/v1/feed/ws` - WebSocket for entry deltas only (pubsub, no cache/persistence reads)
 - `POST /api/v1/events` - Publish event (persists first; requires auth)
 
 **Module Independence**: Owns its `UserRepository` interface (no dependency on auth module). See [Architecture - Module Independence](./architecture.md#module-independence).
@@ -136,7 +135,6 @@ The system implements JWT-based authentication with automatic token management:
 sequenceDiagram
     participant User
     participant API
-    participant Cache
     participant Storage
     participant Broadcast
     participant Viewers
@@ -144,10 +142,8 @@ sequenceDiagram
     User->>API: Publish event (authenticated)
     API->>Storage: Create event
     Storage-->>API: OK
-    API->>Cache: Add event
-    Cache-->>API: OK
     API->>Broadcast: Publish entry delta
-    Broadcast->>Viewers: SSE
+    Broadcast->>Viewers: WebSocket
     API-->>User: 200 OK
 ```
 
@@ -158,51 +154,39 @@ sequenceDiagram
     participant Viewer
     participant API
     participant UC as Use case
-    participant Cache
     participant Storage
     participant Broadcast
     
-    Note over Viewer: GET /feed (cache-aside)
+    Note over Viewer: GET /feed
     Viewer->>API: GET /feed?limit=10&offset=0
     API->>UC: GetFeed(limit, offset)
-    UC->>Cache: GetFeed(limit, offset)
-    alt cache hit (err == nil && total > 0)
-        Cache-->>UC: entries, total
-        UC-->>API: entries, total
-    else cache miss or cache error
-        UC->>Storage: GetFeed(limit, offset)
-        Storage-->>UC: entries, total (paginated)
-        UC-->>API: entries, total
-    end
+    UC->>Storage: GetFeed(limit, offset)
+    Storage-->>UC: entries, total (paginated)
+    UC-->>API: entries, total
     API-->>Viewer: 200 + pagination meta
     
-    Note over Viewer: GET /feed/stream (pubsub only)
-    Viewer->>API: GET /feed/stream
+    Note over Viewer: GET /feed/ws (pubsub only)
+    Viewer->>API: WebSocket upgrade /feed/ws
     API->>UC: SubscribeToFeedEvents
     UC->>Broadcast: Subscribe
     loop deltas
-        Broadcast-->>Viewer: SSE entry
+        Broadcast-->>Viewer: WebSocket message
     end
 ```
 
 **Behavior**:
-- **GET /feed**: Cache-aside strategy with three distinct paths:
-  - **Cache hit** (`err == nil && total > 0`): Returns cached entries immediately.
-  - **Cache error** (`err != nil`): Uses persistence directly with the requested `limit` and `offset`.
-  - **Cache miss** (`err == nil && total == 0`): Uses persistence directly with the requested `limit` and `offset`.
-- **GET /feed/stream**: Pubsub only. Use case: `SubscribeToFeedEvents` (no cache or persistence). Handler: set SSE headers, call `SubscribeToFeedEvents`, loop on channel. Clients must load initial state via GET /feed first.
-- **POST /events**: Persists the event first, then performs best-effort cache and broadcast updates via `PublishEvent`.
+- **GET /feed**: Reads the requested page directly from PostgreSQL.
+- **GET /feed/ws**: Pubsub only. Use case: `SubscribeToFeedEvents` (no persistence reads). Handler: upgrade to WebSocket, subscribe, and push JSON entry messages. Clients must load initial state via `GET /feed` first.
+- **POST /events**: Persists the event first, then broadcasts the live delta via `PublishEvent`.
 
 **UI Behavior**:
 - When a new event is published, the UI refreshes the visible feed window so the newest events remain in view and the paginated list stays aligned with the shared newest-first ordering.
 
-**Characteristics**: Cache-aside for reads and PostgreSQL-first writes; stream is pubsub-only; Redis retains the most recent `1000` feed items; `/feed` and `/feed/stream` are independent.
+**Characteristics**: PostgreSQL is the source of truth for feed history; live stream is pubsub-only; Redis is used for transport rather than feed history; `/feed` and `/feed/ws` are independent.
 
 ### Infrastructure
 
-**Redis (cache)**:
-- List `feed:recent`: JSON-encoded `FeedEvent` entries. `LPUSH`, `LTRIM`, `LLEN`, `LRANGE`.
-- `GetFeed(limit, offset)`: Uses `LRANGE` for paginated entries and `LLEN` for total count.
+**Redis (transport)**:
 - Pub/sub `feed:viewer:updates`: entry-delta JSON for live feed updates.
 
 **PostgreSQL (persistence)**: 

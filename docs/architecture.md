@@ -144,11 +144,11 @@ The architecture consists of four concentric layers, each with specific responsi
 
 **Contains**:
 - HTTP handlers, error mappers, request/response transformation
-- Connection lifecycle management (SSE, WebSocket)
+- Connection lifecycle management (WebSocket)
 
 **Rules**:
 - Delegates business logic to application layer
-- Handles protocol concerns only (HTTP headers, SSE lifecycle)
+- Handles protocol concerns only (HTTP/WebSocket lifecycle)
 - Maps errors to APIError via module-specific error mappers
 
 ### Infrastructure Layer (`infrastructure/`)
@@ -287,18 +287,9 @@ func (r *Repo) GetFeed(...) ([]domain.FeedEvent, error) {
 
 **Orchestrate Business Logic**: Use cases orchestrate by calling multiple repositories/services.
 ```go
-// ✅ Good - orchestrates feed reads with cache-aside fallback
+// ✅ Good - orchestrates feed reads through the persistence interface
 func (uc *UseCase) GetFeed(ctx context.Context, limit, offset int64) ([]domain.FeedEvent, int64, error) {
-    // Try cache first
-    entries, total, err := uc.cacheRepo.GetFeed(ctx, limit, offset)
-    
-    // Cache hit: return immediately
-    if err == nil && total > 0 {
-        return entries, total, nil
-    }
-    
-    // Cache miss or cache error: use persistence directly
-    entries, total, err = uc.persistenceRepo.GetFeed(ctx, limit, offset)
+    entries, total, err := uc.persistenceRepo.GetFeed(ctx, limit, offset)
     return entries, total, err
 }
 ```
