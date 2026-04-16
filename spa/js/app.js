@@ -1,16 +1,22 @@
 class App {
     constructor() {
+        this.eventTypes = [];
         this.init();
     }
 
-    init() {
+    async init() {
         this.setupRouting();
         this.bindEvents();
         const limitSelector = document.getElementById('feed-limit');
         if (limitSelector) {
             limitSelector.value = String(this.getFeedLimit());
         }
-        feedManager.connect(this.getFeedLimit());
+        await this.loadEventTypes();
+        const filterSelector = document.getElementById('feed-event-type-filter');
+        if (filterSelector) {
+            filterSelector.value = this.getEventTypeFilter();
+        }
+        feedManager.connect(this.getFeedLimit(), this.getEventTypeFilter());
         this.updateAuthUI();
     }
 
@@ -35,6 +41,11 @@ class App {
             const limit = parseInt(e.target.value, 10);
             this.setFeedLimit(limit);
             await feedManager.updateLimit(limit);
+        });
+        document.getElementById('feed-event-type-filter')?.addEventListener('change', async (e) => {
+            const eventType = e.target.value;
+            this.setEventTypeFilter(eventType);
+            await feedManager.updateEventTypeFilter(eventType);
         });
     }
 
@@ -136,7 +147,7 @@ class App {
             successDiv.classList.remove('hidden');
             typeInput.value = '';
             contentInput.value = '';
-            await feedManager.loadInitialFeed(this.getFeedLimit());
+            await feedManager.loadInitialFeed(this.getFeedLimit(), this.getEventTypeFilter());
             if (profileMode) {
                 await this.loadProfileData();
             }
@@ -168,6 +179,65 @@ class App {
 
     setFeedLimit(limit) {
         localStorage.setItem('feedLimit', String(limit));
+    }
+
+    getEventTypeFilter() {
+        return localStorage.getItem('feedEventTypeFilter') || '';
+    }
+
+    setEventTypeFilter(eventType) {
+        localStorage.setItem('feedEventTypeFilter', eventType);
+    }
+
+    async loadEventTypes() {
+        try {
+            const response = await api.getEventTypes();
+            this.eventTypes = Array.isArray(response.data) ? response.data : [];
+            this.populateEventTypeSelect('event-type-input');
+            this.populateEventTypeSelect('profile-event-type-input');
+            this.populateEventTypeFilter();
+        } catch (error) {
+            console.error('Error loading event types:', error);
+        }
+    }
+
+    populateEventTypeSelect(id) {
+        const select = document.getElementById(id);
+        if (!select) {
+            return;
+        }
+
+        select.innerHTML = '<option value="">Select event type</option>';
+        this.eventTypes.forEach((eventType) => {
+            const option = document.createElement('option');
+            option.value = eventType;
+            option.textContent = this.formatEventTypeLabel(eventType);
+            select.appendChild(option);
+        });
+    }
+
+    populateEventTypeFilter() {
+        const select = document.getElementById('feed-event-type-filter');
+        if (!select) {
+            return;
+        }
+
+        const currentValue = this.getEventTypeFilter();
+        select.innerHTML = '<option value="">All Types</option>';
+        this.eventTypes.forEach((eventType) => {
+            const option = document.createElement('option');
+            option.value = eventType;
+            option.textContent = this.formatEventTypeLabel(eventType);
+            select.appendChild(option);
+        });
+        select.value = currentValue;
+    }
+
+    formatEventTypeLabel(eventType) {
+        return eventType
+            .split('_')
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' ');
     }
 }
 

@@ -78,6 +78,18 @@
             "type": "string"
           },
           "event_type": {
+            "enum": [
+              "login",
+              "upload",
+              "comment",
+              "notification",
+              "report",
+              "task",
+              "message",
+              "sync",
+              "status",
+              "approval"
+            ],
             "example": "notification",
             "type": "string"
           }
@@ -340,6 +352,25 @@
               "minimum": 0,
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "event_type",
+            "schema": {
+              "enum": [
+                "login",
+                "upload",
+                "comment",
+                "notification",
+                "report",
+                "task",
+                "message",
+                "sync",
+                "status",
+                "approval"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -372,7 +403,54 @@
             "description": "Activity feed retrieved successfully"
           }
         },
-        "summary": "Get the activity feed with pagination",
+        "summary": "Get the activity feed with pagination and optional event-type filtering",
+        "tags": [
+          "feed"
+        ]
+      }
+    },
+    "/feed/event-types": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "items": {
+                            "enum": [
+                              "login",
+                              "upload",
+                              "comment",
+                              "notification",
+                              "report",
+                              "task",
+                              "message",
+                              "sync",
+                              "status",
+                              "approval"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Event types retrieved successfully"
+          }
+        },
+        "summary": "Get the supported event types for publishing and filtering",
         "tags": [
           "feed"
         ]

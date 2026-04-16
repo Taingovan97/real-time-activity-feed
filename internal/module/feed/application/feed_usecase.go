@@ -13,7 +13,7 @@ import (
 
 // FeedUseCase serves the activity feed.
 type FeedUseCase interface {
-	GetFeed(ctx context.Context, limit, offset int64) ([]domain.FeedEvent, int64, error)
+	GetFeed(ctx context.Context, eventType string, limit, offset int64) ([]domain.FeedEvent, int64, error)
 	SubscribeToFeedEvents(ctx context.Context) (<-chan *domain.FeedEvent, error)
 }
 
@@ -40,8 +40,8 @@ func NewFeedUseCase(
 }
 
 // GetFeed returns feed items.
-func (uc *feedUseCase) GetFeed(ctx context.Context, limit, offset int64) ([]domain.FeedEvent, int64, error) {
-	entries, total, err := uc.persistenceRepo.GetFeed(ctx, limit, offset)
+func (uc *feedUseCase) GetFeed(ctx context.Context, eventType string, limit, offset int64) ([]domain.FeedEvent, int64, error) {
+	entries, total, err := uc.persistenceRepo.GetFeed(ctx, eventType, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to retrieve feed: %w", err)
 	}

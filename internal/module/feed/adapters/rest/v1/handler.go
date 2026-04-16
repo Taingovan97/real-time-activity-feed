@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"real-time-activity-feed/internal/module/feed/application"
+	"real-time-activity-feed/internal/module/feed/domain"
 	"real-time-activity-feed/internal/shared/logger"
 	"real-time-activity-feed/internal/shared/middleware"
 	"real-time-activity-feed/internal/shared/request"
@@ -53,22 +54,37 @@ func NewFeedHandler(
 	}
 }
 
+type feedQueryRequest struct {
+	request.Pagination
+	EventType string `form:"event_type"`
+}
+
 // GetFeed handles `GET /feed`.
 func (h *FeedHandler) GetFeed(c *gin.Context) {
-	var pagination request.Pagination
-	if err := c.ShouldBindQuery(&pagination); err != nil {
-		apiErr := toAPIError(validator.Validate(pagination))
+	var query feedQueryRequest
+	if err := c.ShouldBindQuery(&query); err != nil {
+		apiErr := toAPIError(validator.Validate(query))
 		response.Error(c, apiErr)
 		return
 	}
 
-	if err := validator.Validate(pagination); err != nil {
+	if err := validator.Validate(query); err != nil {
 		response.Error(c, toAPIError(err))
 		return
 	}
 
-	normalized := pagination.Normalize()
-	entries, total, err := h.feedUseCase.GetFeed(c.Request.Context(), normalized.GetLimit(), normalized.GetOffset())
+	if err := domain.ValidateEventType(query.EventType); err != nil {
+		response.Error(c, toAPIError(err))
+		return
+	}
+
+	normalized := query.Normalize()
+	entries, total, err := h.feedUseCase.GetFeed(
+		c.Request.Context(),
+		query.EventType,
+		normalized.GetLimit(),
+		normalized.GetOffset(),
+	)
 	if err != nil {
 		h.logger.Err(c.Request.Context(), err).Msg("Feed request error")
 		response.Error(c, toAPIError(err))
@@ -77,6 +93,11 @@ func (h *FeedHandler) GetFeed(c *gin.Context) {
 
 	meta := response.NewPagination(normalized.GetOffset(), normalized.GetLimit(), total)
 	response.SuccessWithMeta(c, entries, "Activity feed retrieved successfully", meta)
+}
+
+// ListEventTypes handles `GET /feed/event-types`.
+func (h *FeedHandler) ListEventTypes(c *gin.Context) {
+	response.Success(c, domain.AllowedEventTypes, "Event types retrieved successfully")
 }
 
 // StreamFeed handles `GET /feed/ws` using WebSocket.
@@ -188,6 +209,7 @@ func (h *FeedHandler) RegisterPublicRoutes(router *gin.RouterGroup) {
 	feed := router.Group("/feed")
 	{
 		feed.GET("", h.GetFeed)
+		feed.GET("/event-types", h.ListEventTypes)
 		feed.GET("/ws", h.StreamFeed)
 	}
 }

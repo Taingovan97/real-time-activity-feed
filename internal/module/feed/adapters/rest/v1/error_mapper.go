@@ -4,6 +4,7 @@ package v1
 import (
 	"errors"
 
+	"real-time-activity-feed/internal/module/feed/domain"
 	"real-time-activity-feed/internal/shared/response"
 	"real-time-activity-feed/internal/shared/validator"
 )
@@ -20,6 +21,11 @@ func toAPIError(err error) *response.APIError {
 		if errors.As(err, &validationErr) {
 			return response.NewValidationError(validationErr.Message)
 		}
+	}
+
+	var invalidEventTypeErr *domain.InvalidEventTypeError
+	if errors.As(err, &invalidEventTypeErr) {
+		return response.NewValidationError(invalidEventTypeErr.Error())
 	}
 
 	// If it's already an APIError, return it as-is

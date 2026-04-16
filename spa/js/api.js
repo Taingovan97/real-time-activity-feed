@@ -128,8 +128,15 @@ class API {
         });
     }
 
-    async getFeed(limit = 10, offset = 0) {
-        return this.request(`/feed?limit=${limit}&offset=${offset}`, { method: 'GET' });
+    async getFeed(limit = 10, offset = 0, eventType = '') {
+        const params = new URLSearchParams({
+            limit: String(limit),
+            offset: String(offset),
+        });
+        if (eventType) {
+            params.set('event_type', eventType);
+        }
+        return this.request(`/feed?${params.toString()}`, { method: 'GET' });
     }
 
     async publishEvent(eventType, content) {
@@ -137,6 +144,10 @@ class API {
             method: 'POST',
             body: JSON.stringify({ event_type: eventType, content }),
         });
+    }
+
+    async getEventTypes() {
+        return this.request('/feed/event-types', { method: 'GET' });
     }
 }
 

@@ -4,6 +4,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"real-time-activity-feed/internal/module/feed/application"
 	"real-time-activity-feed/internal/module/feed/domain"
@@ -41,24 +42,14 @@ func (r *PostgresFeedRepository) CreateEvent(
 	return &created, nil
 }
 
-// CountFeed returns the total number of persisted feed events.
-func (r *PostgresFeedRepository) CountFeed(ctx context.Context) (int64, error) {
-	const query = `SELECT COUNT(*) FROM activity_feed_events`
-
-	var total int64
-	if err := r.pool.QueryRow(ctx, query).Scan(&total); err != nil {
-		return 0, fmt.Errorf("failed to count feed: %w", err)
-	}
-
-	return total, nil
-}
-
 // GetFeed returns feed items ordered newest first.
 func (r *PostgresFeedRepository) GetFeed(
 	ctx context.Context,
+	eventType string,
 	limit, offset int64,
 ) ([]domain.FeedEvent, int64, error) {
-	query := `
+	queryBuilder := strings.Builder{}
+	queryBuilder.WriteString(`
 		SELECT
 			e.id,
 			e.user_id,
@@ -69,11 +60,19 @@ func (r *PostgresFeedRepository) GetFeed(
 			COUNT(*) OVER() AS total
 		FROM activity_feed_events e
 		JOIN users u ON e.user_id = u.id
-		ORDER BY e.created_at DESC, e.id DESC
-		LIMIT $1 OFFSET $2
-	`
+	`)
 
-	rows, err := r.pool.Query(ctx, query, limit, offset)
+	args := []any{}
+	if eventType != "" {
+		queryBuilder.WriteString("\n\t\tWHERE e.event_type = $1")
+		args = append(args, eventType)
+	}
+
+	queryBuilder.WriteString("\n\t\tORDER BY e.created_at DESC, e.id DESC")
+	_, _ = fmt.Fprintf(&queryBuilder, "\n\t\tLIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
+	args = append(args, limit, offset)
+
+	rows, err := r.pool.Query(ctx, queryBuilder.String(), args...)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get feed: %w", err)
 	}

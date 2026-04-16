@@ -83,7 +83,9 @@
             <div id="event-publisher-card" class="hidden gaming-card rounded-2xl p-6 mb-8">
                 <h2 class="text-xl mb-4 neon-glow text-purple-400">Publish A New Event</h2>
                 <form id="feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
-                    <input type="text" id="event-type-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="event type">
+                    <select id="event-type-input" required class="gaming-input px-4 py-3 rounded-lg">
+                        <option value="">Select event type</option>
+                    </select>
                     <input type="text" id="event-content-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
                     <button type="submit" class="gaming-btn gaming-btn-cta text-white font-semibold py-3 px-6 rounded-lg">Publish Event</button>
                 </form>
@@ -107,12 +109,17 @@
                         <h2 class="text-xl neon-glow text-purple-400">Latest Feed</h2>
                         <p class="text-sm text-slate-400">Recent actions and notifications across the system</p>
                     </div>
-                    <select id="feed-limit" class="gaming-input text-sm rounded-lg px-3 py-1.5">
-                        <option value="5">Last 5</option>
-                        <option value="10" selected>Last 10</option>
-                        <option value="50">Last 50</option>
-                        <option value="100">Last 100</option>
-                    </select>
+                    <div class="flex items-center gap-3">
+                        <select id="feed-event-type-filter" class="gaming-input text-sm rounded-lg px-3 py-1.5">
+                            <option value="">All Types</option>
+                        </select>
+                        <select id="feed-limit" class="gaming-input text-sm rounded-lg px-3 py-1.5">
+                            <option value="5">Last 5</option>
+                            <option value="10" selected>Last 10</option>
+                            <option value="50">Last 50</option>
+                            <option value="100">Last 100</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="feed-loading" class="text-center py-12">
                     <p class="mt-4 text-slate-400">Loading activity feed...</p>
@@ -168,7 +175,9 @@
                     <div class="gaming-card rounded-lg p-6 border border-purple-500/30">
                         <h3 class="text-xl text-purple-400 mb-4">Publish Another Event</h3>
                         <form id="profile-feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
-                            <input type="text" id="profile-event-type-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="event type">
+                            <select id="profile-event-type-input" required class="gaming-input px-4 py-3 rounded-lg">
+                                <option value="">Select event type</option>
+                            </select>
                             <input type="text" id="profile-event-content-input" required class="gaming-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
                             <button type="submit" class="gaming-btn gaming-btn-cta text-white font-semibold py-3 px-6 rounded-lg">Publish Event</button>
                         </form>

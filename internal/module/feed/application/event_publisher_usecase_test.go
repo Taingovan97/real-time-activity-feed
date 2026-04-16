@@ -56,3 +56,20 @@ func TestEventPublisherUseCase_PublishEvent_WhenPersistenceFails(t *testing.T) {
 
 	require.Error(t, err)
 }
+
+func TestEventPublisherUseCase_PublishEvent_WhenEventTypeIsInvalid(t *testing.T) {
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	persistence := mocks.NewMockFeedRepository(ctrl)
+	users := mocks.NewMockUserRepository(ctrl)
+	broadcast := mocks.NewMockBroadcastService(ctrl)
+
+	uc := NewEventPublisherUseCase(persistence, users, broadcast, logger.New("info", false))
+	_, err := uc.PublishEvent(ctx, "user-1", PublishEventRequest{EventType: "freeform", Content: "deployment finished"})
+
+	require.Error(t, err)
+	var invalidEventTypeErr *domain.InvalidEventTypeError
+	require.ErrorAs(t, err, &invalidEventTypeErr)
+}

@@ -111,19 +111,20 @@ The system implements JWT-based authentication with automatic token management:
 **Data layer**: PostgreSQL = persistence and feed history; Redis = pub/sub transport for live updates. Handlers only invoke use cases.
 
 **Components**:
-- **Domain**: `FeedEvent` (`domain/feed_event.go`), constants (`domain/constants.go`)
+- **Domain**: `FeedEvent` (`domain/feed_event.go`), fixed event types (`domain/event_types.go`), constants (`domain/constants.go`)
 - **Application**:
-  - `FeedUseCase` - `GetFeed(limit, offset)`, `SubscribeToFeedEvents()`
-  - `eventUseCase` - `PublishEvent()` (persist to PostgreSQL, then broadcast)
+  - `FeedUseCase` - `GetFeed(eventType, limit, offset)`, `SubscribeToFeedEvents()`
+  - `eventUseCase` - `PublishEvent()` (validate fixed event type, persist to PostgreSQL, then broadcast)
   - Repository interfaces: `FeedRepository`, `UserRepository` (module-owned), `BroadcastService`
 - **Adapters**: HTTP handlers, WebSocket upgrade handler, error mapper
 - **Infrastructure**: PostgreSQL persistence and Redis broadcast service
 
 **Repository Interface Methods**:
-- `FeedRepository.GetFeed(limit, offset)` - Returns paginated entries and total count (uses SQL LIMIT/OFFSET and COUNT(*) OVER())
+- `FeedRepository.GetFeed(eventType, limit, offset)` - Returns paginated entries and total count, with optional event-type filtering
 
 **Endpoints**:
-- `GET /api/v1/feed?limit=10&offset=0` - Paginated feed from PostgreSQL
+- `GET /api/v1/feed?limit=10&offset=0&event_type=upload` - Paginated feed from PostgreSQL with optional event-type filtering
+- `GET /api/v1/feed/event-types` - Supported fixed event types for publish and filter dropdowns
 - `GET /api/v1/feed/ws` - WebSocket for entry deltas only (pubsub, no cache/persistence reads)
 - `POST /api/v1/events` - Publish event (persists first; requires auth)
 
@@ -158,9 +159,9 @@ sequenceDiagram
     participant Broadcast
     
     Note over Viewer: GET /feed
-    Viewer->>API: GET /feed?limit=10&offset=0
-    API->>UC: GetFeed(limit, offset)
-    UC->>Storage: GetFeed(limit, offset)
+    Viewer->>API: GET /feed?limit=10&offset=0&event_type=upload
+    API->>UC: GetFeed(eventType, limit, offset)
+    UC->>Storage: GetFeed(eventType, limit, offset)
     Storage-->>UC: entries, total (paginated)
     UC-->>API: entries, total
     API-->>Viewer: 200 + pagination meta
@@ -175,11 +176,14 @@ sequenceDiagram
 ```
 
 **Behavior**:
-- **GET /feed**: Reads the requested page directly from PostgreSQL.
+- **GET /feed**: Reads the requested page directly from PostgreSQL, optionally filtered by fixed `event_type`.
+- **GET /feed/event-types**: Returns the fixed list of supported event types so the SPA can render publish and filter dropdowns without duplicating backend rules.
 - **GET /feed/ws**: Pubsub only. Use case: `SubscribeToFeedEvents` (no persistence reads). Handler: upgrade to WebSocket, subscribe, and push JSON entry messages. Clients must load initial state via `GET /feed` first.
-- **POST /events**: Persists the event first, then broadcasts the live delta via `PublishEvent`.
+- **POST /events**: Validates the fixed event type, persists the event first, then broadcasts the live delta via `PublishEvent`.
 
 **UI Behavior**:
+- Event publishing uses a fixed event-type dropdown instead of a free-text input.
+- The main feed can be filtered by event type using a backend-driven dropdown sourced from `GET /feed/event-types`.
 - When a new event is published, the UI refreshes the visible feed window so the newest events remain in view and the paginated list stays aligned with the shared newest-first ordering.
 
 **Characteristics**: PostgreSQL is the source of truth for feed history; live stream is pubsub-only; Redis is used for transport rather than feed history; `/feed` and `/feed/ws` are independent.
@@ -190,8 +194,8 @@ sequenceDiagram
 - Pub/sub `feed:viewer:updates`: entry-delta JSON for live feed updates.
 
 **PostgreSQL (persistence)**: 
-- `activity_feed_events` table; `CreateEvent`, `GetFeed(limit, offset)`.
-- `GetFeed` uses SQL `LIMIT`/`OFFSET` for pagination and `COUNT(*) OVER()` window function to get total count in the same query. Results are ordered by `created_at DESC, id DESC`.
+- `activity_feed_events` table; `CreateEvent`, `GetFeed(eventType, limit, offset)`.
+- `GetFeed` uses SQL `LIMIT`/`OFFSET` for pagination, optional `event_type` filtering, and `COUNT(*) OVER()` to get total count in the same query. Results are ordered by `created_at DESC, id DESC`.
 
 
 

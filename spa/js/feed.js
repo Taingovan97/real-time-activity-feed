@@ -6,13 +6,15 @@ class FeedManager {
         this.isConnected = false;
         this.entries = [];
         this.limit = 10;
+        this.eventTypeFilter = '';
     }
 
-    async loadInitialFeed(limit = 10) {
+    async loadInitialFeed(limit = 10, eventType = this.eventTypeFilter) {
         try {
-            const response = await api.getFeed(limit, 0);
+            const response = await api.getFeed(limit, 0, eventType);
             if (response.success) {
                 this.limit = limit;
+                this.eventTypeFilter = eventType;
                 this.entries = Array.isArray(response.data) ? response.data : [];
                 this.total = response.meta?.total || this.entries.length;
                 this.renderFeed();
@@ -22,8 +24,8 @@ class FeedManager {
         }
     }
 
-    async connect(limit = 10) {
-        await this.loadInitialFeed(limit);
+    async connect(limit = 10, eventType = '') {
+        await this.loadInitialFeed(limit, eventType);
         this.shouldReconnect = true;
         this.openSocket();
     }
@@ -42,7 +44,12 @@ class FeedManager {
 
     async updateLimit(limit) {
         this.limit = limit;
-        await this.loadInitialFeed(limit);
+        await this.loadInitialFeed(limit, this.eventTypeFilter);
+    }
+
+    async updateEventTypeFilter(eventType) {
+        this.eventTypeFilter = eventType;
+        await this.loadInitialFeed(this.limit, eventType);
     }
 
     dedupeByID(entries) {
@@ -74,6 +81,9 @@ class FeedManager {
             try {
                 const payload = JSON.parse(event.data);
                 if (payload.success && payload.data) {
+                    if (this.eventTypeFilter && payload.data.event_type !== this.eventTypeFilter) {
+                        return;
+                    }
                     this.entries.unshift(payload.data);
                     this.entries = this.dedupeByID(this.entries).slice(0, Math.max(this.limit, 100));
                     this.total = Math.max(this.total || 0, this.entries.length);

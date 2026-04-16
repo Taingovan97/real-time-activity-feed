@@ -90,7 +90,7 @@ paths:
   /feed:
     get:
       tags: [feed]
-      summary: Get the activity feed with pagination
+      summary: Get the activity feed with pagination and optional event-type filtering
       parameters:
         - name: limit
           in: query
@@ -105,6 +105,11 @@ paths:
             type: integer
             minimum: 0
             default: 0
+        - name: event_type
+          in: query
+          schema:
+            type: string
+            enum: [login, upload, comment, notification, report, task, message, sync, status, approval]
       responses:
         '200':
           description: Activity feed retrieved successfully
@@ -121,6 +126,26 @@ paths:
                           $ref: '#/components/schemas/FeedEvent'
                       meta:
                         $ref: '#/components/schemas/Pagination'
+
+  /feed/event-types:
+    get:
+      tags: [feed]
+      summary: Get the supported event types for publishing and filtering
+      responses:
+        '200':
+          description: Event types retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: string
+                          enum: [login, upload, comment, notification, report, task, message, sync, status, approval]
 
   /events:
     post:
@@ -199,6 +224,7 @@ components:
       properties:
         event_type:
           type: string
+          enum: [login, upload, comment, notification, report, task, message, sync, status, approval]
           example: notification
         content:
           type: string

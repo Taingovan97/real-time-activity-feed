@@ -29,7 +29,7 @@ func TestFeedHandler_GetFeed(t *testing.T) {
 
 	mockFeed := mocks.NewMockFeedUseCase(ctrl)
 	mockEvents := mocks.NewMockEventPublisherUseCase(ctrl)
-	mockFeed.EXPECT().GetFeed(gomock.Any(), int64(10), int64(0)).Return([]domain.FeedEvent{{
+	mockFeed.EXPECT().GetFeed(gomock.Any(), "", int64(10), int64(0)).Return([]domain.FeedEvent{{
 		ID: "evt-1", UserID: "user-1", Username: "alice", EventType: "login", Content: "signed in", CreatedAt: time.Now(),
 	}}, int64(1), nil)
 
@@ -44,6 +44,64 @@ func TestFeedHandler_GetFeed(t *testing.T) {
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
 	require.True(t, body.Success)
 	require.Equal(t, "Activity feed retrieved successfully", body.Message)
+}
+
+func TestFeedHandler_GetFeed_WithEventTypeFilter(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFeed := mocks.NewMockFeedUseCase(ctrl)
+	mockEvents := mocks.NewMockEventPublisherUseCase(ctrl)
+	mockFeed.EXPECT().GetFeed(gomock.Any(), domain.EventTypeUpload, int64(10), int64(0)).Return([]domain.FeedEvent{{
+		ID: "evt-1", UserID: "user-1", Username: "alice", EventType: domain.EventTypeUpload, Content: "uploaded file", CreatedAt: time.Now(),
+	}}, int64(1), nil)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest(http.MethodGet, "/feed?limit=10&offset=0&event_type=upload", nil)
+
+	NewFeedHandler(mockFeed, mockEvents, logger.New("info", false)).GetFeed(c)
+
+	require.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestFeedHandler_GetFeed_WhenEventTypeIsInvalid(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFeed := mocks.NewMockFeedUseCase(ctrl)
+	mockEvents := mocks.NewMockEventPublisherUseCase(ctrl)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest(http.MethodGet, "/feed?event_type=freeform", nil)
+
+	NewFeedHandler(mockFeed, mockEvents, logger.New("info", false)).GetFeed(c)
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestFeedHandler_ListEventTypes(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFeed := mocks.NewMockFeedUseCase(ctrl)
+	mockEvents := mocks.NewMockEventPublisherUseCase(ctrl)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest(http.MethodGet, "/feed/event-types", nil)
+
+	NewFeedHandler(mockFeed, mockEvents, logger.New("info", false)).ListEventTypes(c)
+
+	require.Equal(t, http.StatusOK, w.Code)
+	var body response.Response
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+	require.True(t, body.Success)
+	require.Equal(t, "Event types retrieved successfully", body.Message)
 }
 
 func TestFeedHandler_StreamFeed_WebSocket(t *testing.T) {

@@ -48,6 +48,10 @@ type PublishEventRequest struct {
 
 // PublishEvent publishes a new feed event.
 func (uc *eventPublisherUseCase) PublishEvent(ctx context.Context, userID string, req PublishEventRequest) (*domain.FeedEvent, error) {
+	if err := domain.ValidateEventType(req.EventType); err != nil {
+		return nil, err
+	}
+
 	usernames, err := uc.userRepo.GetByIDs(ctx, []string{userID})
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve event publisher: %w", err)
