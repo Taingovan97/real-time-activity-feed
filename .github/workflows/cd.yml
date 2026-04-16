@@ -23,12 +23,12 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+  AWS_REGION: ${{ vars.ECR_REPOSITORY }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
   ECS_TASK_DEFINITION: .aws/ecs/task-definition.staging.json
-  CONTAINER_NAME: app
+  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
 
 jobs:
   deploy:
