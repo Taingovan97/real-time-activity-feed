@@ -1,0 +1,14 @@
+name: 'Initialize Environment'
+description: 'Set up Go environment and run make init-ci'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.25.5'
+
+    - name: Initialize CI environment
+      run: make init-ci
+      shell: bash

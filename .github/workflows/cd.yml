@@ -1,0 +1,82 @@
+name: CD
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: "staging"
+        options:
+          - staging
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: cd-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: .aws/ecs/task-definition.staging.json
+  CONTAINER_NAME: app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'staging' }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: ./.github/actions/init
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push image
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -f docker/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    # - name: Render task definition
+    #   id: task-def
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   with:
+    #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
+    #     container-name: ${{ env.CONTAINER_NAME }}
+    #     image: ${{ steps.build-image.outputs.image }}
+
+    # - name: Deploy to ECS
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+    #   with:
+    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+    #     service: ${{ env.ECS_SERVICE }}
+    #     cluster: ${{ env.ECS_CLUSTER }}
+    #     wait-for-service-stability: true
+
+    # - name: Post-deploy health check
+    #   run: |
+    #     curl --fail --retry 10 --retry-delay 5 https://staging.example.com/health
