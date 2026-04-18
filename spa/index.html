@@ -151,35 +151,35 @@
 </head>
 <body class="continental-shell text-slate-900 min-h-screen">
     <div id="auth-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
-        <div id="login-form" class="w-full max-w-xl">
-            <div class="continental-panel rounded-[30px] p-8 md:p-10">
-                <p class="continental-kicker text-center mb-2">Editorial access</p>
-                <h1 class="text-5xl text-center mb-3 text-[var(--blue-strong)]">Welcome Back</h1>
-                <p class="text-center text-[var(--ink-soft)] mb-8">Sign in to publish events and contribute to the shared brief.</p>
-                <form id="login-form-element" class="space-y-5">
+        <div id="login-form" class="w-full max-w-2xl">
+            <div class="continental-frame rounded-[34px] p-8 md:p-10 lg:p-12">
+                <p class="continental-kicker text-[rgba(255,250,240,0.62)] text-center mb-3">Editorial access</p>
+                <h1 class="editorial-display text-[3.4rem] md:text-[4rem] text-center leading-[0.92] text-[var(--paper-strong)]">Welcome Back</h1>
+                <p class="mt-4 text-center text-[rgba(255,250,240,0.72)] leading-7">Sign in to publish updates and contribute to the live operations issue.</p>
+                <form id="login-form-element" class="mt-8 space-y-5">
                     <input type="text" id="login-username" required class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
                     <input type="password" id="login-password" required class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
-                    <div id="login-error" class="hidden text-sm text-rose-700"></div>
+                    <div id="login-error" class="hidden text-sm text-rose-200"></div>
                     <button type="submit" class="continental-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign In</button>
                 </form>
-                <button id="auth-back-to-feed" class="continental-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
-                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Don't have an account? <button id="show-register" class="continental-inline-link">Sign up</button></p>
+                <button id="auth-back-to-feed" class="continental-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5 text-[var(--paper-strong)] border-[rgba(255,250,240,0.26)] hover:text-[var(--paper-strong)]">Back to Feed</button>
+                <p class="mt-6 text-center text-sm text-[rgba(255,250,240,0.72)]">Don't have an account? <button id="show-register" class="continental-inline-link text-[var(--paper-strong)] decoration-[rgba(255,250,240,0.34)] hover:text-white">Sign up</button></p>
             </div>
         </div>
-        <div id="register-form" class="hidden w-full max-w-xl">
-            <div class="continental-panel rounded-[30px] p-8 md:p-10">
-                <p class="continental-kicker text-center mb-2">Editorial access</p>
-                <h1 class="text-5xl text-center mb-3 text-[var(--blue-strong)]">Create Account</h1>
-                <p class="text-center text-[var(--ink-soft)] mb-8">Sign up to publish events and contribute to the shared brief.</p>
-                <form id="register-form-element" class="space-y-5">
+        <div id="register-form" class="hidden w-full max-w-2xl">
+            <div class="continental-frame rounded-[34px] p-8 md:p-10 lg:p-12">
+                <p class="continental-kicker text-[rgba(255,250,240,0.62)] text-center mb-3">Editorial access</p>
+                <h1 class="editorial-display text-[3.4rem] md:text-[4rem] text-center leading-[0.92] text-[var(--paper-strong)]">Create Account</h1>
+                <p class="mt-4 text-center text-[rgba(255,250,240,0.72)] leading-7">Open a contributor account and add your updates to the live operations issue.</p>
+                <form id="register-form-element" class="mt-8 space-y-5">
                     <input type="text" id="register-username" required minlength="3" maxlength="50" class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
                     <input type="email" id="register-email" required class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Email">
                     <input type="password" id="register-password" required minlength="6" class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
-                    <div id="register-error" class="hidden text-sm text-rose-700"></div>
+                    <div id="register-error" class="hidden text-sm text-rose-200"></div>
                     <button type="submit" class="continental-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign Up</button>
                 </form>
-                <button id="auth-back-to-feed-register" class="continental-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
-                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Already have an account? <button id="show-login" class="continental-inline-link">Sign in</button></p>
+                <button id="auth-back-to-feed-register" class="continental-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5 text-[var(--paper-strong)] border-[rgba(255,250,240,0.26)] hover:text-[var(--paper-strong)]">Back to Feed</button>
+                <p class="mt-6 text-center text-sm text-[rgba(255,250,240,0.72)]">Already have an account? <button id="show-login" class="continental-inline-link text-[var(--paper-strong)] decoration-[rgba(255,250,240,0.34)] hover:text-white">Sign in</button></p>
             </div>
         </div>
     </div>
@@ -296,29 +296,34 @@
     </div>
 
     <div id="not-found-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
-        <div class="continental-panel rounded-[30px] p-12 text-center max-w-xl">
-            <p class="continental-kicker mb-3">Page state</p>
-            <h1 class="text-7xl text-[var(--blue-strong)] mb-4">404</h1>
-            <p class="text-[var(--ink-soft)] mb-8 leading-7">The page you're looking for doesn't exist in this briefing view.</p>
-            <button id="go-home-btn" class="continental-btn font-semibold py-3 px-6 rounded-full">Go to Home</button>
+        <div class="continental-frame rounded-[34px] p-10 md:p-12 text-center max-w-2xl">
+            <p class="continental-kicker text-[rgba(255,250,240,0.62)] mb-3">Page state</p>
+            <h1 class="editorial-display text-[5rem] md:text-[6rem] leading-none text-[var(--paper-strong)]">404</h1>
+            <p class="mt-4 text-[rgba(255,250,240,0.74)] leading-7">The page you requested is not part of this current issue.</p>
+            <button id="go-home-btn" class="continental-btn font-semibold py-3 px-6 rounded-full mt-8">Go to Home</button>
         </div>
     </div>
 
     <div id="profile-container" class="hidden min-h-screen">
         <div class="max-w-7xl mx-auto px-5 py-10 md:py-14">
-            <div class="continental-panel rounded-[32px] p-7 md:p-8 lg:p-10">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                    <div>
-                        <p class="continental-kicker mb-2">Profile brief</p>
-                        <h1 class="text-4xl text-[var(--blue-strong)]">Profile</h1>
+            <div class="space-y-8">
+                <div class="continental-frame rounded-[34px] p-8 md:p-10">
+                    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                        <div class="max-w-2xl">
+                            <p class="continental-kicker text-[rgba(255,250,240,0.62)] mb-3">Profile brief</p>
+                            <h1 class="editorial-display text-[2.8rem] md:text-[3.6rem] leading-[0.92] text-[var(--paper-strong)]">Contributor Profile</h1>
+                            <p class="mt-3 text-[rgba(255,250,240,0.74)] leading-7">Your personal issue summary, recent activity, and direct publishing controls in one high-contrast briefing spread.</p>
+                        </div>
+                        <button id="profile-back-btn" class="continental-btn font-semibold py-3 px-6 rounded-full">Back to Feed</button>
                     </div>
-                    <button id="profile-back-btn" class="continental-btn font-semibold py-3 px-6 rounded-full">Back to Feed</button>
                 </div>
-                <div class="space-y-8">
+
+                <div class="continental-panel rounded-[34px] p-7 md:p-9 lg:p-10">
+                    <div class="space-y-8">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 pb-8 border-b border-slate-300/70">
-                        <div class="w-24 h-24 rounded-full continental-panel-inset flex items-center justify-center text-[var(--blue-strong)] font-bold text-3xl"><span id="profile-avatar-text"></span></div>
+                        <div class="w-24 h-24 rounded-full continental-frame flex items-center justify-center text-[var(--paper-strong)] font-bold text-3xl"><span id="profile-avatar-text"></span></div>
                         <div>
-                            <h2 class="text-2xl text-[var(--blue-strong)] mb-1" id="profile-username">-</h2>
+                            <h2 class="text-2xl text-[var(--ink)] mb-1" id="profile-username">-</h2>
                             <p class="text-[var(--ink-soft)]" id="profile-email">-</p>
                         </div>
                     </div>
@@ -339,6 +344,7 @@
                         </form>
                         <div id="profile-event-error" class="hidden mt-4 text-sm text-red-400"></div>
                         <div id="profile-event-success" class="hidden mt-4 text-sm text-green-400"></div>
+                    </div>
                     </div>
                 </div>
             </div>
