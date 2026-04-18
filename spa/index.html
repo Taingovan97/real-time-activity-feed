@@ -119,8 +119,10 @@
         .text-slate-300 { color: var(--ink-soft) !important; }
         .text-slate-400 { color: var(--ink-muted) !important; }
         .text-purple-400 { color: var(--accent-strong) !important; }
+        .text-purple-300 { color: var(--accent) !important; }
         .text-pink-400 { color: var(--error) !important; }
         .border-purple-500\/30 { border-color: var(--rule) !important; }
+        .border-purple-500\/20 { border-color: rgba(22, 50, 91, 0.08) !important; }
         [class~="bg-slate-900/80"] { background: rgba(255, 255, 255, 0.88) !important; }
         [class~="from-purple-500"][class~="to-pink-500"] { background: linear-gradient(135deg, #dbeafe, #93c5fd) !important; }
     </style>
@@ -190,7 +192,7 @@
                         <option value="">Select event type</option>
                     </select>
                     <input type="text" id="event-content-input" required class="editorial-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
-                    <button type="submit" class="editorial-btn editorial-btn-secondary text-white font-semibold py-3 px-6 rounded-lg">Publish Event</button>
+                    <button type="submit" class="editorial-btn editorial-btn-secondary font-semibold py-3 px-6 rounded-lg">Publish Event</button>
                 </form>
                 <div id="event-error" class="hidden mt-4 text-sm text-red-400"></div>
                 <div id="event-success" class="hidden mt-4 text-sm text-green-400"></div>
@@ -228,7 +230,7 @@
                     <input id="feed-search-query" type="text" class="editorial-input flex-1 px-4 py-3 rounded-lg" placeholder="Search by user or message">
                     <div class="flex gap-3">
                         <button type="submit" class="editorial-btn text-white font-semibold py-3 px-5 rounded-lg">Search</button>
-                        <button type="button" id="feed-search-clear" class="editorial-btn editorial-btn-secondary text-white font-semibold py-3 px-5 rounded-lg">Clear</button>
+                        <button type="button" id="feed-search-clear" class="editorial-btn editorial-btn-secondary font-semibold py-3 px-5 rounded-lg">Clear</button>
                     </div>
                 </form>
                 <div id="feed-loading" class="text-center py-12">
@@ -289,7 +291,7 @@
                                 <option value="">Select event type</option>
                             </select>
                             <input type="text" id="profile-event-content-input" required class="editorial-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
-                            <button type="submit" class="editorial-btn editorial-btn-secondary text-white font-semibold py-3 px-6 rounded-lg">Publish Event</button>
+                            <button type="submit" class="editorial-btn editorial-btn-secondary font-semibold py-3 px-6 rounded-lg">Publish Event</button>
                         </form>
                         <div id="profile-event-error" class="hidden mt-4 text-sm text-red-400"></div>
                         <div id="profile-event-success" class="hidden mt-4 text-sm text-green-400"></div>
