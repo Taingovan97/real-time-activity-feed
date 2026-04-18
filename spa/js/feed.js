@@ -135,8 +135,9 @@ class FeedManager {
         }
         const indicator = statusEl.querySelector('span');
         const text = statusEl.querySelectorAll('span')[1];
-        indicator.className = connected ? 'w-2 h-2 rounded-full bg-green-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500';
+        indicator.className = connected ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' : 'w-2 h-2 rounded-full bg-rose-500';
         if (text) {
+            text.className = connected ? 'text-sm text-slate-600' : 'text-sm text-slate-500';
             text.textContent = connected ? 'Live' : 'Disconnected';
         }
     }
@@ -169,12 +170,12 @@ class FeedManager {
 
         visibleEntries.forEach((entry) => {
             const row = document.createElement('tr');
-            row.className = 'feed-row border-b border-purple-500/20';
+            row.className = 'feed-row border-b border-slate-200/90 align-top';
             row.innerHTML = `
-                <td class="py-4 px-4 text-sm text-slate-300 whitespace-nowrap">${new Date(entry.created_at).toLocaleTimeString()}</td>
-                <td class="py-4 px-4 text-sm text-slate-200 font-medium">${entry.username || 'Unknown'}</td>
-                <td class="py-4 px-4 text-sm text-purple-300">${entry.event_type}</td>
-                <td class="py-4 px-4 text-sm text-slate-300">${entry.content}</td>
+                <td class="py-4 px-4 text-sm text-slate-500 whitespace-nowrap">${new Date(entry.created_at).toLocaleTimeString()}</td>
+                <td class="py-4 px-4 text-sm text-slate-900 font-semibold">${entry.username || 'Unknown'}</td>
+                <td class="py-4 px-4 text-sm"><span class="type-chip">${entry.event_type}</span></td>
+                <td class="py-4 px-4 text-sm text-slate-700 leading-6">${entry.content}</td>
             `;
             bodyEl.appendChild(row);
         });
