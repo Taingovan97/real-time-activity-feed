@@ -19,6 +19,7 @@ import (
 	v1Feed "real-time-activity-feed/internal/module/feed/adapters/rest/v1"
 	feedApp "real-time-activity-feed/internal/module/feed/application"
 	feedBroadcastInfra "real-time-activity-feed/internal/module/feed/infrastructure/broadcast"
+	feedCacheInfra "real-time-activity-feed/internal/module/feed/infrastructure/cache"
 	feedInfra "real-time-activity-feed/internal/module/feed/infrastructure/repository"
 	"real-time-activity-feed/internal/shared/database"
 	"real-time-activity-feed/internal/shared/logger"
@@ -69,16 +70,24 @@ func main() {
 
 	// Initialize broadcast service (infrastructure layer)
 	broadcastService := feedBroadcastInfra.NewRedisBroadcastService(redisClient.GetClient(), l)
+	feedCache := feedCacheInfra.NewRedisFeedCache(redisClient.GetClient(), 30*time.Second)
 
 	// Initialize use cases
 	authUseCase := authApp.NewAuthUseCase(userRepo, jwtMgr, l)
 	eventPublisherUseCase := feedApp.NewEventPublisherUseCase(
 		persistenceRepo,
 		feedUserRepo,
+		feedCache,
 		broadcastService,
 		l,
 	)
-	feedUseCase := feedApp.NewFeedUseCase(persistenceRepo, feedUserRepo, broadcastService, l)
+	feedUseCase := feedApp.NewFeedUseCase(
+		persistenceRepo,
+		feedCache,
+		feedUserRepo,
+		broadcastService,
+		l,
+	)
 
 	// Initialize handlers
 	authHandler := v1Auth.NewHandler(authUseCase, l)

@@ -19,6 +19,7 @@ type EventPublisherUseCase interface {
 type eventPublisherUseCase struct {
 	persistenceRepo  FeedRepository
 	userRepo         UserRepository
+	cache            FeedCache
 	broadcastService BroadcastService
 	logger           *logger.Logger
 }
@@ -29,12 +30,14 @@ type eventPublisherUseCase struct {
 func NewEventPublisherUseCase(
 	persistenceRepo FeedRepository,
 	userRepo UserRepository,
+	cache FeedCache,
 	broadcastService BroadcastService,
 	l *logger.Logger,
 ) *eventPublisherUseCase {
 	return &eventPublisherUseCase{
 		persistenceRepo:  persistenceRepo,
 		userRepo:         userRepo,
+		cache:            cache,
 		broadcastService: broadcastService,
 		logger:           l,
 	}
@@ -68,6 +71,10 @@ func (uc *eventPublisherUseCase) PublishEvent(ctx context.Context, userID string
 	if err != nil {
 		uc.logger.Errorf(ctx, "Failed to persist feed event: %v", err)
 		return nil, fmt.Errorf("failed to publish event: %w", err)
+	}
+
+	if err := uc.cache.InvalidateAfterPublish(ctx, req.EventType); err != nil {
+		uc.logger.Warnf(ctx, "Failed to invalidate feed cache: %v", err)
 	}
 
 	if err := uc.broadcastService.BroadcastEvent(ctx, created); err != nil {
