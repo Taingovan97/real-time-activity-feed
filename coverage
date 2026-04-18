@@ -1,0 +1,16 @@
+mode: set
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:34.26,41.2 1 1
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:50.135,51.64 1 1
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:51.64,53.3 1 1
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:55.2,56.16 2 1
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:56.16,58.3 1 0
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:60.2,68.16 3 1
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:68.16,71.3 2 1
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:73.2,73.73 1 1
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:73.73,75.3 1 0
+real-time-activity-feed/internal/module/feed/application/event_publisher_usecase.go:77.2,78.21 2 1
+real-time-activity-feed/internal/module/feed/application/feed_usecase.go:34.16,40.2 1 1
+real-time-activity-feed/internal/module/feed/application/feed_usecase.go:43.134,45.16 2 1
+real-time-activity-feed/internal/module/feed/application/feed_usecase.go:45.16,47.3 1 1
+real-time-activity-feed/internal/module/feed/application/feed_usecase.go:49.2,49.28 1 1
+real-time-activity-feed/internal/module/feed/application/feed_usecase.go:53.101,55.2 1 0
