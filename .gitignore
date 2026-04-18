@@ -34,3 +34,4 @@ go.work.sum
 # Others
 tmp/
 .worktrees/
+.superpowers/
