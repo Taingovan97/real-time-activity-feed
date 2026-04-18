@@ -185,34 +185,44 @@
     </div>
 
     <div id="feed-container" class="min-h-screen text-slate-900">
-        <header class="border-b border-[rgba(20,34,53,0.12)] sticky top-0 z-50 backdrop-blur-md bg-[rgba(247,241,232,0.82)]">
-            <div class="max-w-7xl mx-auto px-5 py-5 flex items-center justify-between">
-                <div>
-                    <p class="continental-kicker mb-2">Shared activity stream</p>
-                    <h1 class="text-[2.1rem] leading-none text-[var(--blue-strong)]">Real-Time Activity Feed</h1>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div id="connection-status" class="flex items-center gap-2 rounded-full border border-[rgba(20,34,53,0.12)] bg-[rgba(255,250,240,0.82)] px-3 py-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-sm text-slate-600">Live</span>
+        <header class="continental-frame relative overflow-hidden border-b border-[rgba(255,250,240,0.12)] sticky top-0 z-50">
+            <div class="absolute inset-0 opacity-60 pointer-events-none bg-[radial-gradient(circle_at_top_left,_rgba(255,250,240,0.12),_transparent_34%),linear-gradient(135deg,_rgba(255,255,255,0.04),_transparent_48%)]"></div>
+            <div class="relative max-w-7xl mx-auto px-5 lg:px-8 py-8 md:py-12">
+                <div class="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="continental-kicker text-[rgba(255,250,240,0.62)] mb-3">Shared activity stream</p>
+                        <h1 class="editorial-display text-[3rem] md:text-[4.4rem] leading-[0.9] text-[var(--paper-strong)]">Real-Time Activity Feed</h1>
+                        <p class="mt-4 max-w-2xl text-[rgba(255,250,240,0.72)] text-base md:text-lg leading-7">
+                            A live operations briefing presented as a continuous editorial ledger.
+                        </p>
                     </div>
-                    <div id="user-dropdown" class="hidden relative">
-                        <a href="#" id="profile-link" class="flex items-center gap-2 text-sm text-slate-600">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--blue)] to-[var(--navy-soft)] flex items-center justify-center text-white font-semibold"><span id="user-avatar-text"></span></div>
-                            <span id="user-name"></span>
-                        </a>
-                        <button id="logout-btn" class="ml-3 text-sm text-[var(--error)]">Log out</button>
-                        <div class="hidden">
-                            <span id="dropdown-user-name"></span>
-                            <span id="dropdown-user-email"></span>
+                    <div class="flex items-start gap-4">
+                        <div id="connection-status" class="border border-[rgba(255,250,240,0.18)] bg-[rgba(255,250,240,0.06)] px-4 py-2 rounded-full">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="text-sm text-[rgba(255,250,240,0.82)]">Live</span>
+                            </div>
+                        </div>
+                        <div id="user-dropdown" class="hidden relative">
+                            <div class="flex items-center gap-3">
+                                <a href="#" id="profile-link" class="flex items-center gap-2 text-sm text-[rgba(255,250,240,0.82)]">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--blue)] to-[var(--navy-strong)] flex items-center justify-center text-white font-semibold"><span id="user-avatar-text"></span></div>
+                                    <span id="user-name"></span>
+                                </a>
+                                <button id="logout-btn" class="text-sm text-[rgba(255,250,240,0.62)] hover:text-[rgba(255,250,240,0.88)] transition-colors">Log out</button>
+                            </div>
+                            <div class="hidden">
+                                <span id="dropdown-user-name"></span>
+                                <span id="dropdown-user-email"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-5 py-10 md:py-14">
-            <div id="event-publisher-card" class="hidden continental-panel rounded-[32px] p-7 md:p-8 lg:p-10 mb-8">
+        <main class="max-w-7xl mx-auto px-5 lg:px-8 py-8 md:py-12">
+            <div id="event-publisher-card" class="hidden continental-panel rounded-[34px] p-7 md:p-8 lg:p-10 mb-10">
                 <h2 class="text-xl mb-4">Publish A New Event</h2>
                 <form id="feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
                     <select id="event-type-input" required class="continental-input px-4 py-3 rounded-lg">
@@ -225,26 +235,26 @@
                 <div id="event-success" class="hidden mt-4 text-sm text-green-400"></div>
             </div>
 
-            <div id="event-publisher-prompt" class="continental-panel-inset rounded-[28px] p-7 md:p-8 mb-8">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <section id="event-publisher-prompt" class="continental-frame rounded-[34px] p-8 md:p-10 mb-10">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-2xl">
-                        <p class="continental-kicker mb-2">Contribution</p>
-                        <h2 class="text-3xl text-[var(--blue-strong)] mb-2">Want to publish events?</h2>
-                        <p class="text-[var(--ink-soft)] text-base leading-7">Sign in to post new events to the shared feed and keep the running brief up to date.</p>
+                        <p class="continental-kicker text-[rgba(255,250,240,0.62)] mb-3">Contribute</p>
+                        <h2 class="editorial-display text-[2.4rem] md:text-[3rem] leading-[0.94] text-[var(--paper-strong)]">Publish a new event</h2>
+                        <p class="mt-3 text-[rgba(255,250,240,0.74)] leading-7">Sign in to add decisions, approvals, incidents, and release notes to the live issue.</p>
                     </div>
                     <button id="publish-event-btn" class="continental-btn font-semibold py-3.5 px-7 rounded-full">Sign In</button>
                 </div>
-            </div>
+            </section>
 
-            <div class="continental-panel rounded-[32px] p-7 md:p-8 lg:p-10">
-                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
+            <section class="continental-panel rounded-[34px] p-7 md:p-9 lg:p-10">
+                <div class="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_auto] lg:items-end mb-8">
                     <div class="max-w-2xl">
-                        <p class="continental-kicker mb-2">Editorial view</p>
-                        <h2 class="text-4xl text-[var(--blue-strong)] leading-none mb-3">Latest Feed</h2>
-                        <p class="text-[var(--ink-soft)] text-base leading-7">Recent actions and notifications across the system, arranged as a readable live briefing.</p>
+                        <p class="continental-kicker mb-3">Feature spread</p>
+                        <h2 class="editorial-display text-[2.6rem] md:text-[3.4rem] leading-[0.92] text-[var(--ink)]">Latest Feed</h2>
+                        <p class="mt-3 text-[var(--ink-soft)] text-base md:text-lg leading-7">Recent actions and notifications across the system, presented as a classic briefing table.</p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <select id="feed-event-type-filter" class="continental-input text-sm rounded-full px-4 py-2.5 min-w-[150px]">
+                    <div class="flex flex-wrap items-center gap-3 lg:justify-end">
+                        <select id="feed-event-type-filter" class="continental-input text-sm rounded-full px-4 py-2.5 min-w-[160px]">
                             <option value="">All Types</option>
                         </select>
                         <select id="feed-limit" class="continental-input text-sm rounded-full px-4 py-2.5 min-w-[130px]">
@@ -255,7 +265,7 @@
                         </select>
                     </div>
                 </div>
-                <form id="feed-search-form" class="mb-8 rounded-[24px] border border-[rgba(20,34,53,0.12)] bg-[rgba(255,250,240,0.72)] p-4 md:p-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <form id="feed-search-form" class="mb-8 border-t border-b continental-rule py-5 flex flex-col gap-4 lg:flex-row lg:items-center">
                     <input id="feed-search-query" type="text" class="continental-input flex-1 px-5 py-3.5 rounded-full" placeholder="Search by user or message">
                     <div class="flex gap-3">
                         <button type="submit" class="continental-btn font-semibold py-3 px-6 rounded-full">Search</button>
@@ -268,20 +278,20 @@
                 <div id="feed-empty" class="hidden text-center py-12">
                     <p class="text-slate-400">No events yet. Publish the first event.</p>
                 </div>
-                <div id="feed-content" class="hidden overflow-x-auto rounded-[24px] border border-slate-300/70 bg-white/75">
-                    <table class="w-full min-w-[720px]">
+                <div id="feed-content" class="hidden overflow-x-auto rounded-[26px] border border-[rgba(20,34,53,0.12)] bg-[rgba(255,250,240,0.78)]">
+                    <table class="w-full min-w-[760px]">
                         <thead>
-                            <tr class="border-b border-slate-300/70">
-                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-slate-500">Time</th>
-                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-slate-500">User</th>
-                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-slate-500">Type</th>
-                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-slate-500">Message</th>
+                            <tr class="border-b border-[rgba(20,34,53,0.12)]">
+                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-[var(--ink-muted)]">Time</th>
+                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-[var(--ink-muted)]">User</th>
+                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-[var(--ink-muted)]">Type</th>
+                                <th class="text-left py-4 px-4 text-xs font-semibold tracking-[0.18em] uppercase text-[var(--ink-muted)]">Message</th>
                             </tr>
                         </thead>
                         <tbody id="feed-body"></tbody>
                     </table>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
