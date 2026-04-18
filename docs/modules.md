@@ -108,16 +108,16 @@ The system implements JWT-based authentication with automatic token management:
 
 **Purpose**: event publishing and real-time feed queries via WebSocket
 
-**Data layer**: PostgreSQL = persistence and feed history; Redis = pub/sub transport for live updates. Handlers only invoke use cases.
+**Data layer**: PostgreSQL = persistence and feed history; Redis = pub/sub transport for live updates and hot-page cache for selected feed reads. Handlers only invoke use cases.
 
 **Components**:
 - **Domain**: `FeedEvent` (`domain/feed_event.go`), fixed event types (`domain/event_types.go`), constants (`domain/constants.go`)
 - **Application**:
   - `FeedUseCase` - `GetFeed(eventType, limit, offset)`, `SubscribeToFeedEvents()`
   - `eventUseCase` - `PublishEvent()` (validate fixed event type, persist to PostgreSQL, then broadcast)
-  - Repository interfaces: `FeedRepository`, `UserRepository` (module-owned), `BroadcastService`
+  - Repository interfaces: `FeedRepository`, `UserRepository` (module-owned), `BroadcastService`, `FeedCache`
 - **Adapters**: HTTP handlers, WebSocket upgrade handler, error mapper
-- **Infrastructure**: PostgreSQL persistence and Redis broadcast service
+- **Infrastructure**: PostgreSQL persistence, Redis broadcast service, and Redis-backed feed cache
 
 **Repository Interface Methods**:
 - `FeedRepository.GetFeed(eventType, query, limit, offset)` - Returns paginated entries and total count, with optional event-type filtering and text search across usernames and messages
@@ -176,7 +176,7 @@ sequenceDiagram
 ```
 
 **Behavior**:
-- **GET /feed**: Reads the requested page directly from PostgreSQL, optionally filtered by fixed `event_type` and `query`. Search matches `content` and `username`.
+- **GET /feed**: Reads the requested page from PostgreSQL by default. Cacheable hot views (initially first-page reads with no search and optional `event_type`) use Redis cache-aside with short TTLs. Search matches `content` and `username`, and PostgreSQL remains the source of truth.
 - **GET /feed/event-types**: Returns the fixed list of supported event types so the SPA can render publish and filter dropdowns without duplicating backend rules.
 - **GET /feed/ws**: Pubsub only. Use case: `SubscribeToFeedEvents` (no persistence reads). Handler: upgrade to WebSocket, subscribe, and push JSON entry messages. Clients must load initial state via `GET /feed` first.
 - **POST /events**: Validates the fixed event type, persists the event first, then broadcasts the live delta via `PublishEvent`.
@@ -187,12 +187,13 @@ sequenceDiagram
 - The main feed supports text search across usernames and messages, and search can be combined with the event-type filter.
 - When a new event is published, the UI refreshes the visible feed window so the newest events remain in view and the paginated list stays aligned with the shared newest-first ordering.
 
-**Characteristics**: PostgreSQL is the source of truth for feed history; live stream is pubsub-only; Redis is used for transport rather than feed history; `/feed` and `/feed/ws` are independent.
+**Characteristics**: PostgreSQL is the source of truth for feed history; Redis is used for pub/sub transport and hot read caching for bounded feed views; `/feed` and `/feed/ws` remain independent.
 
 ### Infrastructure
 
-**Redis (transport)**:
+**Redis (transport + hot cache)**:
 - Pub/sub `feed:viewer:updates`: entry-delta JSON for live feed updates.
+- Cache-aside feed page keys for bounded hot views, with short TTLs and publish-triggered invalidation.
 
 **PostgreSQL (persistence)**: 
 - `activity_feed_events` table; `CreateEvent`, `GetFeed(eventType, query, limit, offset)`.
