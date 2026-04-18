@@ -10,187 +10,198 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --page-bg: #f4f1ea;
-            --page-bg-alt: #fbfaf7;
-            --surface: rgba(255, 255, 255, 0.88);
-            --surface-strong: #ffffff;
-            --surface-tint: #eef4fb;
+            --paper: #f3ede2;
+            --paper-soft: #ede5d8;
+            --paper-strong: #fffaf0;
             --ink: #142235;
-            --ink-soft: #41556f;
-            --ink-muted: #6d7b8c;
-            --rule: rgba(22, 50, 91, 0.12);
-            --rule-strong: rgba(22, 50, 91, 0.22);
-            --accent: #2563eb;
-            --accent-strong: #16325b;
-            --accent-soft: #dbeafe;
-            --success: #1f8f5f;
-            --error: #b84d56;
-            --shadow-soft: 0 18px 40px rgba(20, 34, 53, 0.07);
-            --shadow-lift: 0 24px 50px rgba(20, 34, 53, 0.1);
+            --ink-soft: #4d5d72;
+            --ink-muted: #718198;
+            --navy: #152338;
+            --navy-soft: #1d2d45;
+            --navy-strong: #0f1b2b;
+            --blue: #2d5baf;
+            --blue-strong: #1d417f;
+            --blue-soft: #d8e5f7;
+            --rule: rgba(20, 34, 53, 0.14);
+            --rule-strong: rgba(20, 34, 53, 0.24);
+            --success: #14805e;
+            --error: #b6534d;
+            --shadow-soft: 0 18px 45px rgba(15, 27, 43, 0.08);
+            --shadow-lift: 0 24px 60px rgba(15, 27, 43, 0.14);
         }
 
         * { font-family: 'Manrope', 'Segoe UI', sans-serif; }
-        h1, h2, h3 {
+        h1, h2, h3, .editorial-display {
             font-family: 'Cormorant Garamond', Georgia, serif;
             letter-spacing: 0.01em;
         }
 
         body {
             background:
-                radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
-                linear-gradient(180deg, var(--page-bg-alt), var(--page-bg));
+                radial-gradient(circle at top left, rgba(29, 65, 127, 0.08), transparent 24%),
+                linear-gradient(180deg, #f7f1e8 0%, var(--paper) 100%);
             color: var(--ink);
         }
 
-        .editorial-shell { min-height: 100vh; }
-        .editorial-panel {
-            background: var(--surface);
-            border: 1px solid var(--rule);
+        .continental-shell {
+            min-height: 100vh;
+            background: transparent;
+        }
+
+        .continental-frame {
+            background: linear-gradient(180deg, var(--navy) 0%, var(--navy-soft) 100%);
+            color: var(--paper-strong);
+            box-shadow: var(--shadow-lift);
+        }
+
+        .continental-panel {
+            background: rgba(255, 250, 240, 0.92);
+            border: 1px solid rgba(20, 34, 53, 0.1);
             box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(10px);
         }
-        .editorial-panel-quiet {
-            background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.72));
-            border: 1px solid var(--rule);
+
+        .continental-panel-inset {
+            background: linear-gradient(180deg, rgba(255,250,240,0.96), rgba(243,237,226,0.92));
+            border: 1px solid rgba(20, 34, 53, 0.12);
         }
-        .editorial-panel-tint {
-            background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(219,234,254,0.72));
-            border: 1px solid rgba(37, 99, 235, 0.18);
-            box-shadow: var(--shadow-soft);
+
+        .continental-rule {
+            border-color: var(--rule);
         }
-        .editorial-input {
-            background: rgba(255,255,255,0.9);
+
+        .continental-input {
+            background: rgba(255, 250, 240, 0.96);
             color: var(--ink);
             border: 1px solid var(--rule-strong);
         }
-        .editorial-input:focus {
+
+        .continental-input:focus {
             outline: none;
-            border-color: rgba(37, 99, 235, 0.45);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+            border-color: rgba(45, 91, 175, 0.48);
+            box-shadow: 0 0 0 4px rgba(45, 91, 175, 0.12);
         }
-        .editorial-btn {
-            background: linear-gradient(180deg, #2563eb, #1d4ed8);
-            color: white;
-            border: 1px solid rgba(22, 50, 91, 0.12);
+
+        .continental-btn {
+            background: linear-gradient(180deg, var(--blue) 0%, var(--blue-strong) 100%);
+            color: #fefaf3;
+            border: 1px solid rgba(20, 34, 53, 0.12);
             transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+            box-shadow: 0 12px 28px rgba(29, 65, 127, 0.24);
         }
-        .editorial-btn:hover {
+
+        .continental-btn:hover {
             transform: translateY(-1px);
-            background: linear-gradient(180deg, #1d4ed8, #1e40af);
-            box-shadow: 0 16px 28px rgba(37, 99, 235, 0.2);
+            background: linear-gradient(180deg, #244f9d 0%, #173668 100%);
+            box-shadow: 0 16px 36px rgba(29, 65, 127, 0.28);
         }
-        .editorial-btn-secondary {
-            background: rgba(255,255,255,0.9);
-            color: var(--accent-strong);
-            border: 1px solid rgba(22, 50, 91, 0.16);
-            transition: background 180ms ease, border-color 180ms ease;
+
+        .continental-btn-secondary {
+            background: transparent;
+            color: var(--ink);
+            border: 1px solid var(--rule-strong);
+            transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
         }
-        .editorial-btn-secondary:hover {
-            background: rgba(219,234,254,0.45);
-            border-color: rgba(37, 99, 235, 0.25);
+
+        .continental-btn-secondary:hover {
+            background: rgba(216, 229, 247, 0.36);
+            border-color: rgba(45, 91, 175, 0.26);
+            color: var(--blue-strong);
         }
-        .editorial-inline-link {
-            color: var(--accent-strong);
+
+        .continental-inline-link {
+            color: var(--blue-strong);
             text-decoration: underline;
-            text-decoration-color: rgba(22, 50, 91, 0.22);
+            text-decoration-color: rgba(29, 65, 127, 0.2);
             text-underline-offset: 0.18em;
             transition: color 180ms ease, text-decoration-color 180ms ease;
         }
-        .editorial-inline-link:hover {
-            color: var(--accent);
-            text-decoration-color: rgba(37, 99, 235, 0.4);
+
+        .continental-inline-link:hover {
+            color: var(--blue);
+            text-decoration-color: rgba(45, 91, 175, 0.34);
         }
-        .editorial-kicker {
+
+        .continental-kicker {
             font-size: 0.72rem;
-            letter-spacing: 0.16em;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
             color: var(--ink-muted);
         }
+
         .feed-row {
-            transition: background 180ms ease, transform 180ms ease;
+            transition: background 180ms ease;
         }
+
         .feed-row:hover {
-            background: rgba(219, 234, 254, 0.28);
+            background: rgba(216, 229, 247, 0.22);
         }
+
         .type-chip {
             display: inline-flex;
             align-items: center;
-            padding: 0.26rem 0.7rem;
+            padding: 0.22rem 0.72rem;
             border-radius: 999px;
-            background: rgba(219, 234, 254, 0.65);
-            color: var(--accent-strong);
-            border: 1px solid rgba(37, 99, 235, 0.12);
+            background: rgba(216, 229, 247, 0.58);
+            border: 1px solid rgba(29, 65, 127, 0.12);
+            color: var(--blue-strong);
             font-size: 0.78rem;
             font-weight: 600;
         }
-
-        .text-slate-100 { color: var(--ink) !important; }
-        .text-slate-200 { color: var(--ink) !important; }
-        .text-slate-300 { color: var(--ink-soft) !important; }
-        .text-slate-400 { color: var(--ink-muted) !important; }
-        .text-purple-400 { color: var(--accent-strong) !important; }
-        .text-purple-300 { color: var(--accent) !important; }
-        .text-pink-400 { color: var(--error) !important; }
-        .border-purple-500\/30 { border-color: var(--rule) !important; }
-        .border-purple-500\/20 { border-color: rgba(22, 50, 91, 0.08) !important; }
-        [class~="bg-slate-900/80"] { background: rgba(255, 255, 255, 0.88) !important; }
-        [class~="from-purple-500"][class~="to-pink-500"] { background: linear-gradient(135deg, #dbeafe, #93c5fd) !important; }
     </style>
 </head>
-<body class="editorial-shell text-slate-100 min-h-screen">
+<body class="continental-shell text-slate-900 min-h-screen">
     <div id="auth-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
         <div id="login-form" class="w-full max-w-xl">
-            <div class="editorial-panel rounded-[30px] p-8 md:p-10">
-                <p class="editorial-kicker text-center mb-2">Editorial access</p>
-                <h1 class="text-5xl text-center mb-3 text-[var(--accent-strong)]">Welcome Back</h1>
+            <div class="continental-panel rounded-[30px] p-8 md:p-10">
+                <p class="continental-kicker text-center mb-2">Editorial access</p>
+                <h1 class="text-5xl text-center mb-3 text-[var(--blue-strong)]">Welcome Back</h1>
                 <p class="text-center text-[var(--ink-soft)] mb-8">Sign in to publish events and contribute to the shared brief.</p>
                 <form id="login-form-element" class="space-y-5">
-                    <input type="text" id="login-username" required class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
-                    <input type="password" id="login-password" required class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
+                    <input type="text" id="login-username" required class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
+                    <input type="password" id="login-password" required class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
                     <div id="login-error" class="hidden text-sm text-rose-700"></div>
-                    <button type="submit" class="editorial-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign In</button>
+                    <button type="submit" class="continental-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign In</button>
                 </form>
-                <button id="auth-back-to-feed" class="editorial-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
-                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Don't have an account? <button id="show-register" class="editorial-inline-link">Sign up</button></p>
+                <button id="auth-back-to-feed" class="continental-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
+                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Don't have an account? <button id="show-register" class="continental-inline-link">Sign up</button></p>
             </div>
         </div>
         <div id="register-form" class="hidden w-full max-w-xl">
-            <div class="editorial-panel rounded-[30px] p-8 md:p-10">
-                <p class="editorial-kicker text-center mb-2">Editorial access</p>
-                <h1 class="text-5xl text-center mb-3 text-[var(--accent-strong)]">Create Account</h1>
+            <div class="continental-panel rounded-[30px] p-8 md:p-10">
+                <p class="continental-kicker text-center mb-2">Editorial access</p>
+                <h1 class="text-5xl text-center mb-3 text-[var(--blue-strong)]">Create Account</h1>
                 <p class="text-center text-[var(--ink-soft)] mb-8">Sign up to publish events and contribute to the shared brief.</p>
                 <form id="register-form-element" class="space-y-5">
-                    <input type="text" id="register-username" required minlength="3" maxlength="50" class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
-                    <input type="email" id="register-email" required class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Email">
-                    <input type="password" id="register-password" required minlength="6" class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
+                    <input type="text" id="register-username" required minlength="3" maxlength="50" class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
+                    <input type="email" id="register-email" required class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Email">
+                    <input type="password" id="register-password" required minlength="6" class="continental-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
                     <div id="register-error" class="hidden text-sm text-rose-700"></div>
-                    <button type="submit" class="editorial-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign Up</button>
+                    <button type="submit" class="continental-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign Up</button>
                 </form>
-                <button id="auth-back-to-feed-register" class="editorial-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
-                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Already have an account? <button id="show-login" class="editorial-inline-link">Sign in</button></p>
+                <button id="auth-back-to-feed-register" class="continental-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
+                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Already have an account? <button id="show-login" class="continental-inline-link">Sign in</button></p>
             </div>
         </div>
     </div>
 
     <div id="feed-container" class="min-h-screen text-slate-900">
-        <header class="border-b border-slate-300/70 sticky top-0 z-50 backdrop-blur-md bg-[rgba(251,250,247,0.82)]">
+        <header class="border-b border-[rgba(20,34,53,0.12)] sticky top-0 z-50 backdrop-blur-md bg-[rgba(247,241,232,0.82)]">
             <div class="max-w-7xl mx-auto px-5 py-5 flex items-center justify-between">
                 <div>
-                    <p class="editorial-kicker mb-2">Shared activity stream</p>
-                    <h1 class="text-[2.1rem] leading-none text-[var(--accent-strong)]">Real-Time Activity Feed</h1>
+                    <p class="continental-kicker mb-2">Shared activity stream</p>
+                    <h1 class="text-[2.1rem] leading-none text-[var(--blue-strong)]">Real-Time Activity Feed</h1>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div id="connection-status" class="flex items-center gap-2 rounded-full border border-slate-300/70 bg-white/80 px-3 py-1.5">
+                    <div id="connection-status" class="flex items-center gap-2 rounded-full border border-[rgba(20,34,53,0.12)] bg-[rgba(255,250,240,0.82)] px-3 py-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span class="text-sm text-slate-600">Live</span>
                     </div>
                     <div id="user-dropdown" class="hidden relative">
                         <a href="#" id="profile-link" class="flex items-center gap-2 text-sm text-slate-600">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold"><span id="user-avatar-text"></span></div>
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--blue)] to-[var(--navy-soft)] flex items-center justify-center text-white font-semibold"><span id="user-avatar-text"></span></div>
                             <span id="user-name"></span>
                         </a>
-                        <button id="logout-btn" class="ml-3 text-sm text-red-300">Log out</button>
+                        <button id="logout-btn" class="ml-3 text-sm text-[var(--error)]">Log out</button>
                         <div class="hidden">
                             <span id="dropdown-user-name"></span>
                             <span id="dropdown-user-email"></span>
@@ -201,42 +212,42 @@
         </header>
 
         <main class="max-w-7xl mx-auto px-5 py-10 md:py-14">
-            <div id="event-publisher-card" class="hidden editorial-panel rounded-[32px] p-7 md:p-8 lg:p-10 mb-8">
+            <div id="event-publisher-card" class="hidden continental-panel rounded-[32px] p-7 md:p-8 lg:p-10 mb-8">
                 <h2 class="text-xl mb-4">Publish A New Event</h2>
                 <form id="feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
-                    <select id="event-type-input" required class="editorial-input px-4 py-3 rounded-lg">
+                    <select id="event-type-input" required class="continental-input px-4 py-3 rounded-lg">
                         <option value="">Select event type</option>
                     </select>
-                    <input type="text" id="event-content-input" required class="editorial-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
-                    <button type="submit" class="editorial-btn editorial-btn-secondary font-semibold py-3 px-6 rounded-lg">Publish Event</button>
+                    <input type="text" id="event-content-input" required class="continental-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
+                    <button type="submit" class="continental-btn font-semibold py-3 px-6 rounded-lg">Publish Event</button>
                 </form>
                 <div id="event-error" class="hidden mt-4 text-sm text-red-400"></div>
                 <div id="event-success" class="hidden mt-4 text-sm text-green-400"></div>
             </div>
 
-            <div id="event-publisher-prompt" class="editorial-panel-tint rounded-[28px] p-7 md:p-8 mb-8">
+            <div id="event-publisher-prompt" class="continental-panel-inset rounded-[28px] p-7 md:p-8 mb-8">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
                     <div class="max-w-2xl">
-                        <p class="editorial-kicker mb-2">Contribution</p>
-                        <h2 class="text-3xl text-[var(--accent-strong)] mb-2">Want to publish events?</h2>
+                        <p class="continental-kicker mb-2">Contribution</p>
+                        <h2 class="text-3xl text-[var(--blue-strong)] mb-2">Want to publish events?</h2>
                         <p class="text-[var(--ink-soft)] text-base leading-7">Sign in to post new events to the shared feed and keep the running brief up to date.</p>
                     </div>
-                    <button id="publish-event-btn" class="editorial-btn font-semibold py-3.5 px-7 rounded-full">Sign In</button>
+                    <button id="publish-event-btn" class="continental-btn font-semibold py-3.5 px-7 rounded-full">Sign In</button>
                 </div>
             </div>
 
-            <div class="editorial-panel rounded-[32px] p-7 md:p-8 lg:p-10">
+            <div class="continental-panel rounded-[32px] p-7 md:p-8 lg:p-10">
                 <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
                     <div class="max-w-2xl">
-                        <p class="editorial-kicker mb-2">Editorial view</p>
-                        <h2 class="text-4xl text-[var(--accent-strong)] leading-none mb-3">Latest Feed</h2>
+                        <p class="continental-kicker mb-2">Editorial view</p>
+                        <h2 class="text-4xl text-[var(--blue-strong)] leading-none mb-3">Latest Feed</h2>
                         <p class="text-[var(--ink-soft)] text-base leading-7">Recent actions and notifications across the system, arranged as a readable live briefing.</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
-                        <select id="feed-event-type-filter" class="editorial-input text-sm rounded-full px-4 py-2.5 min-w-[150px]">
+                        <select id="feed-event-type-filter" class="continental-input text-sm rounded-full px-4 py-2.5 min-w-[150px]">
                             <option value="">All Types</option>
                         </select>
-                        <select id="feed-limit" class="editorial-input text-sm rounded-full px-4 py-2.5 min-w-[130px]">
+                        <select id="feed-limit" class="continental-input text-sm rounded-full px-4 py-2.5 min-w-[130px]">
                             <option value="5">Last 5</option>
                             <option value="10" selected>Last 10</option>
                             <option value="50">Last 50</option>
@@ -244,11 +255,11 @@
                         </select>
                     </div>
                 </div>
-                <form id="feed-search-form" class="mb-8 rounded-[24px] border border-slate-300/70 bg-[rgba(255,255,255,0.7)] p-4 md:p-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <input id="feed-search-query" type="text" class="editorial-input flex-1 px-5 py-3.5 rounded-full" placeholder="Search by user or message">
+                <form id="feed-search-form" class="mb-8 rounded-[24px] border border-[rgba(20,34,53,0.12)] bg-[rgba(255,250,240,0.72)] p-4 md:p-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <input id="feed-search-query" type="text" class="continental-input flex-1 px-5 py-3.5 rounded-full" placeholder="Search by user or message">
                     <div class="flex gap-3">
-                        <button type="submit" class="editorial-btn font-semibold py-3 px-6 rounded-full">Search</button>
-                        <button type="button" id="feed-search-clear" class="editorial-btn-secondary font-semibold py-3 px-6 rounded-full">Clear</button>
+                        <button type="submit" class="continental-btn font-semibold py-3 px-6 rounded-full">Search</button>
+                        <button type="button" id="feed-search-clear" class="continental-btn-secondary font-semibold py-3 px-6 rounded-full">Clear</button>
                     </div>
                 </form>
                 <div id="feed-loading" class="text-center py-12">
@@ -275,46 +286,46 @@
     </div>
 
     <div id="not-found-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
-        <div class="editorial-panel rounded-[30px] p-12 text-center max-w-xl">
-            <p class="editorial-kicker mb-3">Page state</p>
-            <h1 class="text-7xl text-[var(--accent-strong)] mb-4">404</h1>
+        <div class="continental-panel rounded-[30px] p-12 text-center max-w-xl">
+            <p class="continental-kicker mb-3">Page state</p>
+            <h1 class="text-7xl text-[var(--blue-strong)] mb-4">404</h1>
             <p class="text-[var(--ink-soft)] mb-8 leading-7">The page you're looking for doesn't exist in this briefing view.</p>
-            <button id="go-home-btn" class="editorial-btn font-semibold py-3 px-6 rounded-full">Go to Home</button>
+            <button id="go-home-btn" class="continental-btn font-semibold py-3 px-6 rounded-full">Go to Home</button>
         </div>
     </div>
 
     <div id="profile-container" class="hidden min-h-screen">
         <div class="max-w-7xl mx-auto px-5 py-10 md:py-14">
-            <div class="editorial-panel rounded-[32px] p-7 md:p-8 lg:p-10">
+            <div class="continental-panel rounded-[32px] p-7 md:p-8 lg:p-10">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <div>
-                        <p class="editorial-kicker mb-2">Profile brief</p>
-                        <h1 class="text-4xl text-[var(--accent-strong)]">Profile</h1>
+                        <p class="continental-kicker mb-2">Profile brief</p>
+                        <h1 class="text-4xl text-[var(--blue-strong)]">Profile</h1>
                     </div>
-                    <button id="profile-back-btn" class="editorial-btn font-semibold py-3 px-6 rounded-full">Back to Feed</button>
+                    <button id="profile-back-btn" class="continental-btn font-semibold py-3 px-6 rounded-full">Back to Feed</button>
                 </div>
                 <div class="space-y-8">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 pb-8 border-b border-slate-300/70">
-                        <div class="w-24 h-24 rounded-full editorial-panel-quiet flex items-center justify-center text-[var(--accent-strong)] font-bold text-3xl"><span id="profile-avatar-text"></span></div>
+                        <div class="w-24 h-24 rounded-full continental-panel-inset flex items-center justify-center text-[var(--blue-strong)] font-bold text-3xl"><span id="profile-avatar-text"></span></div>
                         <div>
-                            <h2 class="text-2xl text-[var(--accent-strong)] mb-1" id="profile-username">-</h2>
+                            <h2 class="text-2xl text-[var(--blue-strong)] mb-1" id="profile-username">-</h2>
                             <p class="text-[var(--ink-soft)]" id="profile-email">-</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="editorial-panel-quiet rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Latest Event Type</div><div class="text-xl text-[var(--accent-strong)]" id="profile-latest-event-type">-</div></div>
-                        <div class="editorial-panel-quiet rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Latest Event Time</div><div class="text-xl text-[var(--accent-strong)]" id="profile-latest-event-time">-</div></div>
-                        <div class="editorial-panel-quiet rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Your Events</div><div class="text-xl text-[var(--accent-strong)]" id="profile-total-events">0</div></div>
+                        <div class="continental-panel-inset rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Latest Event Type</div><div class="text-xl text-[var(--blue-strong)]" id="profile-latest-event-type">-</div></div>
+                        <div class="continental-panel-inset rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Latest Event Time</div><div class="text-xl text-[var(--blue-strong)]" id="profile-latest-event-time">-</div></div>
+                        <div class="continental-panel-inset rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Your Events</div><div class="text-xl text-[var(--blue-strong)]" id="profile-total-events">0</div></div>
                     </div>
-                    <div class="editorial-panel-quiet rounded-[28px] p-6 md:p-7">
-                        <p class="editorial-kicker mb-2">Contribution</p>
-                        <h3 class="text-2xl text-[var(--accent-strong)] mb-5">Publish Another Event</h3>
+                    <div class="continental-panel-inset rounded-[28px] p-6 md:p-7">
+                        <p class="continental-kicker mb-2">Contribution</p>
+                        <h3 class="text-2xl text-[var(--blue-strong)] mb-5">Publish Another Event</h3>
                         <form id="profile-feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
-                            <select id="profile-event-type-input" required class="editorial-input px-4 py-3 rounded-full">
+                            <select id="profile-event-type-input" required class="continental-input px-4 py-3 rounded-full">
                                 <option value="">Select event type</option>
                             </select>
-                            <input type="text" id="profile-event-content-input" required class="editorial-input px-4 py-3 rounded-full" placeholder="Describe what happened">
-                            <button type="submit" class="editorial-btn editorial-btn-secondary font-semibold py-3 px-6 rounded-full">Publish Event</button>
+                            <input type="text" id="profile-event-content-input" required class="continental-input px-4 py-3 rounded-full" placeholder="Describe what happened">
+                            <button type="submit" class="continental-btn font-semibold py-3 px-6 rounded-full">Publish Event</button>
                         </form>
                         <div id="profile-event-error" class="hidden mt-4 text-sm text-red-400"></div>
                         <div id="profile-event-success" class="hidden mt-4 text-sm text-green-400"></div>
