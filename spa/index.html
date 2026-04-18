@@ -129,32 +129,34 @@
 </head>
 <body class="editorial-shell text-slate-100 min-h-screen">
     <div id="auth-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
-        <div id="login-form" class="w-full max-w-md">
-            <div class="editorial-panel rounded-2xl p-8">
-                <h1 class="text-3xl text-center mb-2">Welcome Back</h1>
-                <p class="text-center text-slate-400 mb-8">Sign in to publish events</p>
-                <form id="login-form-element" class="space-y-6">
-                    <input type="text" id="login-username" required class="editorial-input w-full px-4 py-3 rounded-lg" placeholder="Username">
-                    <input type="password" id="login-password" required class="editorial-input w-full px-4 py-3 rounded-lg" placeholder="Password">
-                    <div id="login-error" class="hidden text-sm text-red-400"></div>
-                    <button type="submit" class="editorial-btn w-full text-white font-semibold py-3 px-4 rounded-lg">Sign In</button>
+        <div id="login-form" class="w-full max-w-xl">
+            <div class="editorial-panel rounded-[30px] p-8 md:p-10">
+                <p class="editorial-kicker text-center mb-2">Editorial access</p>
+                <h1 class="text-5xl text-center mb-3 text-[var(--accent-strong)]">Welcome Back</h1>
+                <p class="text-center text-[var(--ink-soft)] mb-8">Sign in to publish events and contribute to the shared brief.</p>
+                <form id="login-form-element" class="space-y-5">
+                    <input type="text" id="login-username" required class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
+                    <input type="password" id="login-password" required class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
+                    <div id="login-error" class="hidden text-sm text-rose-700"></div>
+                    <button type="submit" class="editorial-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign In</button>
                 </form>
-                <button id="auth-back-to-feed" class="editorial-btn w-full text-white font-semibold py-3 px-4 rounded-lg mt-6">Back to Feed</button>
+                <button id="auth-back-to-feed" class="editorial-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
                 <p class="mt-6 text-center text-sm text-slate-400">Don't have an account? <button id="show-register" class="text-purple-400">Sign up</button></p>
             </div>
         </div>
-        <div id="register-form" class="hidden w-full max-w-md">
-            <div class="editorial-panel rounded-2xl p-8">
-                <h1 class="text-3xl text-center mb-2">Create Account</h1>
-                <p class="text-center text-slate-400 mb-8">Sign up to publish events</p>
-                <form id="register-form-element" class="space-y-6">
-                    <input type="text" id="register-username" required minlength="3" maxlength="50" class="editorial-input w-full px-4 py-3 rounded-lg" placeholder="Username">
-                    <input type="email" id="register-email" required class="editorial-input w-full px-4 py-3 rounded-lg" placeholder="Email">
-                    <input type="password" id="register-password" required minlength="6" class="editorial-input w-full px-4 py-3 rounded-lg" placeholder="Password">
-                    <div id="register-error" class="hidden text-sm text-red-400"></div>
-                    <button type="submit" class="editorial-btn w-full text-white font-semibold py-3 px-4 rounded-lg">Sign Up</button>
+        <div id="register-form" class="hidden w-full max-w-xl">
+            <div class="editorial-panel rounded-[30px] p-8 md:p-10">
+                <p class="editorial-kicker text-center mb-2">Editorial access</p>
+                <h1 class="text-5xl text-center mb-3 text-[var(--accent-strong)]">Create Account</h1>
+                <p class="text-center text-[var(--ink-soft)] mb-8">Sign up to publish events and contribute to the shared brief.</p>
+                <form id="register-form-element" class="space-y-5">
+                    <input type="text" id="register-username" required minlength="3" maxlength="50" class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Username">
+                    <input type="email" id="register-email" required class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Email">
+                    <input type="password" id="register-password" required minlength="6" class="editorial-input w-full px-5 py-3.5 rounded-full" placeholder="Password">
+                    <div id="register-error" class="hidden text-sm text-rose-700"></div>
+                    <button type="submit" class="editorial-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign Up</button>
                 </form>
-                <button id="auth-back-to-feed-register" class="editorial-btn w-full text-white font-semibold py-3 px-4 rounded-lg mt-6">Back to Feed</button>
+                <button id="auth-back-to-feed-register" class="editorial-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
                 <p class="mt-6 text-center text-sm text-slate-400">Already have an account? <button id="show-login" class="text-purple-400">Sign in</button></p>
             </div>
         </div>
@@ -262,41 +264,46 @@
     </div>
 
     <div id="not-found-container" class="hidden min-h-screen flex items-center justify-center px-4 py-12">
-        <div class="text-center editorial-panel p-12 rounded-2xl">
-            <h1 class="text-6xl text-pink-400 mb-4">404</h1>
-            <p class="text-slate-400 mb-8">The page you're looking for doesn't exist.</p>
-            <button id="go-home-btn" class="editorial-btn text-white font-semibold py-3 px-6 rounded-lg">Go to Home</button>
+        <div class="editorial-panel rounded-[30px] p-12 text-center max-w-xl">
+            <p class="editorial-kicker mb-3">Page state</p>
+            <h1 class="text-7xl text-[var(--accent-strong)] mb-4">404</h1>
+            <p class="text-[var(--ink-soft)] mb-8 leading-7">The page you're looking for doesn't exist in this briefing view.</p>
+            <button id="go-home-btn" class="editorial-btn font-semibold py-3 px-6 rounded-full">Go to Home</button>
         </div>
     </div>
 
     <div id="profile-container" class="hidden min-h-screen">
-        <div class="max-w-4xl mx-auto px-4 py-8">
-            <div class="editorial-panel rounded-2xl p-8 mb-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h1 class="text-3xl">Profile</h1>
-                    <button id="profile-back-btn" class="editorial-btn text-white font-semibold py-2 px-4 rounded-lg">Back to Feed</button>
+        <div class="max-w-7xl mx-auto px-5 py-10 md:py-14">
+            <div class="editorial-panel rounded-[32px] p-7 md:p-8 lg:p-10">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                    <div>
+                        <p class="editorial-kicker mb-2">Profile brief</p>
+                        <h1 class="text-4xl text-[var(--accent-strong)]">Profile</h1>
+                    </div>
+                    <button id="profile-back-btn" class="editorial-btn font-semibold py-3 px-6 rounded-full">Back to Feed</button>
                 </div>
-                <div class="space-y-6">
-                    <div class="flex items-center gap-6 pb-6 border-b border-purple-500/30">
-                        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-3xl"><span id="profile-avatar-text"></span></div>
+                <div class="space-y-8">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 pb-8 border-b border-slate-300/70">
+                        <div class="w-24 h-24 rounded-full editorial-panel-quiet flex items-center justify-center text-[var(--accent-strong)] font-bold text-3xl"><span id="profile-avatar-text"></span></div>
                         <div>
-                            <h2 class="text-2xl text-slate-200 mb-1" id="profile-username">-</h2>
-                            <p class="text-slate-400" id="profile-email">-</p>
+                            <h2 class="text-2xl text-[var(--accent-strong)] mb-1" id="profile-username">-</h2>
+                            <p class="text-[var(--ink-soft)]" id="profile-email">-</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="editorial-panel rounded-lg p-4 border border-purple-500/30"><div class="text-sm text-slate-400 mb-1">Latest Event Type</div><div class="text-xl text-purple-400" id="profile-latest-event-type">-</div></div>
-                        <div class="editorial-panel rounded-lg p-4 border border-purple-500/30"><div class="text-sm text-slate-400 mb-1">Latest Event Time</div><div class="text-xl text-purple-400" id="profile-latest-event-time">-</div></div>
-                        <div class="editorial-panel rounded-lg p-4 border border-purple-500/30"><div class="text-sm text-slate-400 mb-1">Your Events</div><div class="text-xl text-purple-400" id="profile-total-events">0</div></div>
+                        <div class="editorial-panel-quiet rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Latest Event Type</div><div class="text-xl text-[var(--accent-strong)]" id="profile-latest-event-type">-</div></div>
+                        <div class="editorial-panel-quiet rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Latest Event Time</div><div class="text-xl text-[var(--accent-strong)]" id="profile-latest-event-time">-</div></div>
+                        <div class="editorial-panel-quiet rounded-[24px] p-5"><div class="text-sm text-slate-400 mb-1">Your Events</div><div class="text-xl text-[var(--accent-strong)]" id="profile-total-events">0</div></div>
                     </div>
-                    <div class="editorial-panel rounded-lg p-6 border border-purple-500/30">
-                        <h3 class="text-xl text-purple-400 mb-4">Publish Another Event</h3>
+                    <div class="editorial-panel-quiet rounded-[28px] p-6 md:p-7">
+                        <p class="editorial-kicker mb-2">Contribution</p>
+                        <h3 class="text-2xl text-[var(--accent-strong)] mb-5">Publish Another Event</h3>
                         <form id="profile-feed-form" class="grid gap-4 md:grid-cols-[180px,1fr,auto]">
-                            <select id="profile-event-type-input" required class="editorial-input px-4 py-3 rounded-lg">
+                            <select id="profile-event-type-input" required class="editorial-input px-4 py-3 rounded-full">
                                 <option value="">Select event type</option>
                             </select>
-                            <input type="text" id="profile-event-content-input" required class="editorial-input px-4 py-3 rounded-lg" placeholder="Describe what happened">
-                            <button type="submit" class="editorial-btn editorial-btn-secondary font-semibold py-3 px-6 rounded-lg">Publish Event</button>
+                            <input type="text" id="profile-event-content-input" required class="editorial-input px-4 py-3 rounded-full" placeholder="Describe what happened">
+                            <button type="submit" class="editorial-btn-secondary font-semibold py-3 px-6 rounded-full">Publish Event</button>
                         </form>
                         <div id="profile-event-error" class="hidden mt-4 text-sm text-red-400"></div>
                         <div id="profile-event-success" class="hidden mt-4 text-sm text-green-400"></div>
