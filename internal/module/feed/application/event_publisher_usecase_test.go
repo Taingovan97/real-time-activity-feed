@@ -181,10 +181,20 @@ func TestEventPublisherUseCase_PublishEvent(t *testing.T) {
 
 			persistence := mocks.NewMockFeedRepository(ctrl)
 			users := mocks.NewMockUserRepository(ctrl)
+			cache := mocks.NewMockFeedCache(ctrl)
 			broadcast := mocks.NewMockBroadcastService(ctrl)
 			expected := tt.setupMocks(ctx, persistence, users, broadcast)
 
-			uc := NewEventPublisherUseCase(persistence, users, broadcast, logger.New("info", false))
+			switch tt.name {
+			case "when request is valid should publish event":
+				cache.EXPECT().InvalidateAfterPublish(ctx, domain.EventTypeNotification).Return(nil).Times(1)
+			case "when broadcast fails should still return created event":
+				cache.EXPECT().InvalidateAfterPublish(ctx, domain.EventTypeNotification).Return(nil).Times(1)
+			default:
+				cache.EXPECT().InvalidateAfterPublish(gomock.Any(), gomock.Any()).Times(0)
+			}
+
+			uc := NewEventPublisherUseCase(persistence, users, cache, broadcast, logger.New("info", false))
 
 			// Act
 			result, err := uc.PublishEvent(ctx, "user-1", tt.req)
@@ -194,4 +204,83 @@ func TestEventPublisherUseCase_PublishEvent(t *testing.T) {
 			require.Equal(t, expected, result)
 		})
 	}
+}
+
+func TestEventPublisherUseCase_PublishEvent_InvalidatesCacheAfterPersist(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	persistence := mocks.NewMockFeedRepository(ctrl)
+	users := mocks.NewMockUserRepository(ctrl)
+	cache := mocks.NewMockFeedCache(ctrl)
+	broadcast := mocks.NewMockBroadcastService(ctrl)
+
+	created := &domain.FeedEvent{
+		ID:        "evt-1",
+		UserID:    "user-1",
+		Username:  "alice",
+		EventType: domain.EventTypeNotification,
+		Content:   "deployment finished",
+		CreatedAt: time.Now(),
+	}
+
+	users.EXPECT().GetByIDs(ctx, []string{"user-1"}).Return(map[string]string{"user-1": "alice"}, nil).Times(1)
+	persistence.EXPECT().CreateEvent(ctx, domain.FeedEvent{
+		UserID:    "user-1",
+		Username:  "alice",
+		EventType: domain.EventTypeNotification,
+		Content:   "deployment finished",
+	}).Return(created, nil).Times(1)
+	cache.EXPECT().InvalidateAfterPublish(ctx, domain.EventTypeNotification).Return(nil).Times(1)
+	broadcast.EXPECT().BroadcastEvent(ctx, created).Return(nil).Times(1)
+
+	uc := NewEventPublisherUseCase(persistence, users, cache, broadcast, logger.New("info", false))
+
+	result, err := uc.PublishEvent(ctx, "user-1", PublishEventRequest{
+		EventType: domain.EventTypeNotification,
+		Content:   "deployment finished",
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, created, result)
+}
+
+func TestEventPublisherUseCase_PublishEvent_ContinuesWhenInvalidationFails(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	persistence := mocks.NewMockFeedRepository(ctrl)
+	users := mocks.NewMockUserRepository(ctrl)
+	cache := mocks.NewMockFeedCache(ctrl)
+	broadcast := mocks.NewMockBroadcastService(ctrl)
+
+	created := &domain.FeedEvent{
+		ID:        "evt-2",
+		UserID:    "user-1",
+		Username:  "alice",
+		EventType: domain.EventTypeUpload,
+		Content:   "report uploaded",
+		CreatedAt: time.Now(),
+	}
+
+	users.EXPECT().GetByIDs(ctx, []string{"user-1"}).Return(map[string]string{"user-1": "alice"}, nil).Times(1)
+	persistence.EXPECT().CreateEvent(gomock.Any(), gomock.Any()).Return(created, nil).Times(1)
+	cache.EXPECT().InvalidateAfterPublish(ctx, domain.EventTypeUpload).Return(errors.New("redis down")).Times(1)
+	broadcast.EXPECT().BroadcastEvent(ctx, created).Return(nil).Times(1)
+
+	uc := NewEventPublisherUseCase(persistence, users, cache, broadcast, logger.New("info", false))
+
+	result, err := uc.PublishEvent(ctx, "user-1", PublishEventRequest{
+		EventType: domain.EventTypeUpload,
+		Content:   "report uploaded",
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, created, result)
 }
