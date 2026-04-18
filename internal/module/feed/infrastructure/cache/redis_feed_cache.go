@@ -22,6 +22,7 @@ type RedisFeedCache struct {
 	ttl    time.Duration
 }
 
+// NewRedisFeedCache creates a Redis-backed feed cache with the provided TTL.
 func NewRedisFeedCache(client *redis.Client, ttl time.Duration) *RedisFeedCache {
 	return &RedisFeedCache{
 		client: client,
@@ -52,6 +53,7 @@ func unmarshalCachedFeedPage(raw string) (cachedFeedPage, error) {
 	return page, err
 }
 
+// GetFeed returns a cached feed page when present.
 func (c *RedisFeedCache) GetFeed(ctx context.Context, eventType string, limit, offset int64) ([]domain.FeedEvent, int64, bool, error) {
 	raw, err := c.client.Get(ctx, buildFeedPageKey(eventType, limit, offset)).Result()
 	if err == redis.Nil {
@@ -69,6 +71,7 @@ func (c *RedisFeedCache) GetFeed(ctx context.Context, eventType string, limit, o
 	return page.Entries, page.Total, true, nil
 }
 
+// SetFeed stores a feed page in Redis using the configured TTL.
 func (c *RedisFeedCache) SetFeed(ctx context.Context, eventType string, limit, offset int64, entries []domain.FeedEvent, total int64) error {
 	payload, err := marshalCachedFeedPage(cachedFeedPage{
 		Entries: entries,
@@ -81,6 +84,7 @@ func (c *RedisFeedCache) SetFeed(ctx context.Context, eventType string, limit, o
 	return c.client.Set(ctx, buildFeedPageKey(eventType, limit, offset), payload, c.ttl).Err()
 }
 
+// InvalidateAfterPublish clears the hot cached pages affected by a new event.
 func (c *RedisFeedCache) InvalidateAfterPublish(ctx context.Context, eventType string) error {
 	keys := []string{
 		buildFeedPageKey("", 10, 0),
