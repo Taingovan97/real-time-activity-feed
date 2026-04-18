@@ -90,6 +90,17 @@
             background: rgba(219,234,254,0.45);
             border-color: rgba(37, 99, 235, 0.25);
         }
+        .editorial-inline-link {
+            color: var(--accent-strong);
+            text-decoration: underline;
+            text-decoration-color: rgba(22, 50, 91, 0.22);
+            text-underline-offset: 0.18em;
+            transition: color 180ms ease, text-decoration-color 180ms ease;
+        }
+        .editorial-inline-link:hover {
+            color: var(--accent);
+            text-decoration-color: rgba(37, 99, 235, 0.4);
+        }
         .editorial-kicker {
             font-size: 0.72rem;
             letter-spacing: 0.16em;
@@ -141,7 +152,7 @@
                     <button type="submit" class="editorial-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign In</button>
                 </form>
                 <button id="auth-back-to-feed" class="editorial-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
-                <p class="mt-6 text-center text-sm text-slate-400">Don't have an account? <button id="show-register" class="text-purple-400">Sign up</button></p>
+                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Don't have an account? <button id="show-register" class="editorial-inline-link">Sign up</button></p>
             </div>
         </div>
         <div id="register-form" class="hidden w-full max-w-xl">
@@ -157,7 +168,7 @@
                     <button type="submit" class="editorial-btn w-full font-semibold py-3.5 px-4 rounded-full">Sign Up</button>
                 </form>
                 <button id="auth-back-to-feed-register" class="editorial-btn-secondary w-full font-semibold py-3.5 px-4 rounded-full mt-5">Back to Feed</button>
-                <p class="mt-6 text-center text-sm text-slate-400">Already have an account? <button id="show-login" class="text-purple-400">Sign in</button></p>
+                <p class="mt-6 text-center text-sm text-[var(--ink-soft)]">Already have an account? <button id="show-login" class="editorial-inline-link">Sign in</button></p>
             </div>
         </div>
     </div>
