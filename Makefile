@@ -20,11 +20,11 @@ help:
 
 ## init-dev: Install all required tools and libs for lint, test, build, local full run with docker compose
 init-dev:
-	@sh ./scripts/init.sh dev
+	@bash ./scripts/init.sh dev
 
 ## init-ci: Initialize CI environment (check lint and go installation only)
 init-ci:
-	@sh ./scripts/init.sh ci
+	@bash ./scripts/init.sh ci
 
 ## build: Build the docker image for the application
 build:
@@ -34,11 +34,11 @@ build:
 
 ## start-dev: Start compose deps file and start the application with air in local VM. Uses migrate script with db url pointing to localhost
 start-dev: init-dev
-	@sh ./scripts/run.sh dev
+	@bash ./scripts/run.sh dev
 
 ## run: Run full Docker Swarm stack with app and deps. Uses migrate script with db url pointing to localhost
 run: init-dev build
-	@sh ./scripts/run.sh prod-like
+	@bash ./scripts/run.sh prod-like
 
 ## lint: Run linter (golangci-lint)
 lint:
@@ -48,7 +48,7 @@ lint:
 
 ## ut: Run unit tests with coverage report
 ut:
-	@sh ./scripts/test.sh
+	@bash ./scripts/test.sh
 
 ## code-gen: Generate mocks and other code
 code-gen:
@@ -65,7 +65,7 @@ doc-gen:
 ## check: Run linter, code generation, unit tests, doc generation, and workflow validation locally
 check: lint code-gen ut doc-gen
 	@echo "Validating workflow syntax..."
-	@sh ./scripts/validate-workflows.sh
+	@bash ./scripts/validate-workflows.sh
 	@echo "All checks completed successfully"
 
 ## stop: Stop Docker Swarm stack from 'run' target. Containers removed, volumes/data preserved
