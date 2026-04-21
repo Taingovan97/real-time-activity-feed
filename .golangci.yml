@@ -3,14 +3,6 @@ version: 2
 run:
   timeout: 5m
   tests: true
-  skip-dirs:
-    - vendor
-    - bin
-    - api
-  skip-files:
-    - ".*\\.pb\\.go$"
-    - ".*\\.gen\\.go$"
-    - "api/docs\\.go"
 
 linters-settings:
   errcheck:
@@ -26,8 +18,6 @@ linters-settings:
       - opinionated
       - performance
       - style
-  govet:
-    check-shadowing: true
   gocyclo:
     min-complexity: 15
   misspell:
@@ -47,6 +37,7 @@ linters:
     - gocritic
     - gosec
     - govet
+    - shadow
     - ineffassign
     - misspell
     - revive
@@ -54,6 +45,14 @@ linters:
     - unused
 
 issues:
+  exclude-dirs:
+    - vendor
+    - bin
+    - api
+  exclude-files:
+    - ".*\\.pb\\.go$"
+    - ".*\\.gen\\.go$"
+    - "api/docs\\.go"
   exclude-rules:
     - path: _test\.go
       linters:

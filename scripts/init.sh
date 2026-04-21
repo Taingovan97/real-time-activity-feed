@@ -41,7 +41,7 @@ check_go() {
         echo "Error: Go is not installed. Please install Go first."
         exit 1
     fi
-    echo "✓ Go is installed"
+    echo "OK: Go is installed"
 }
 
 # Function to check golangci-lint
@@ -50,15 +50,15 @@ check_golangci_lint() {
         echo "Error: golangci-lint is not installed."
         return 1
     fi
-    echo "✓ golangci-lint is installed"
+    echo "OK: golangci-lint is installed"
     return 0
 }
 
 # Function to install golangci-lint
 install_golangci_lint() {
     echo "Installing golangci-lint..."
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest > /dev/null 2>&1
-    echo "✓ golangci-lint installed"
+    go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest > /dev/null 2>&1
+    echo "OK: golangci-lint installed"
 }
 
 # Function to check migrate tool
@@ -67,7 +67,7 @@ check_migrate() {
         echo "Error: migrate tool is not installed."
         return 1
     fi
-    echo "✓ migrate tool is installed"
+    echo "OK: migrate tool is installed"
     return 0
 }
 
@@ -75,7 +75,7 @@ check_migrate() {
 install_migrate() {
     echo "Installing migrate tool..."
     go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest > /dev/null 2>&1
-    echo "✓ migrate tool installed"
+    echo "OK: migrate tool installed"
 }
 
 # Function to check air
@@ -84,7 +84,7 @@ check_air() {
         echo "Error: air is not installed."
         return 1
     fi
-    echo "✓ air is installed"
+    echo "OK: air is installed"
     return 0
 }
 
@@ -92,7 +92,7 @@ check_air() {
 install_air() {
     echo "Installing air..."
     go install github.com/air-verse/air@latest > /dev/null 2>&1
-    echo "✓ air installed"
+    echo "OK: air installed"
 }
 
 # Function to check wait4x
@@ -101,7 +101,7 @@ check_wait4x() {
         echo "Error: wait4x is not installed."
         return 1
     fi
-    echo "✓ wait4x is installed"
+    echo "OK: wait4x is installed"
     return 0
 }
 
@@ -109,7 +109,7 @@ check_wait4x() {
 install_wait4x() {
     echo "Installing wait4x..."
     go install wait4x.dev/v3/cmd/wait4x@latest > /dev/null 2>&1
-    echo "✓ wait4x installed"
+    echo "OK: wait4x installed"
 }
 
 # Function to check act
@@ -118,7 +118,7 @@ check_act() {
         echo "Error: act is not installed."
         return 1
     fi
-    echo "✓ act is installed"
+    echo "OK: act is installed"
     return 0
 }
 
@@ -135,7 +135,7 @@ install_act() {
         tar -xz -C /tmp && \
         mv /tmp/act $(go env GOPATH)/bin/act && \
         chmod +x $(go env GOPATH)/bin/act
-    echo "✓ act installed"
+    echo "OK: act installed"
 }
 
 # Function to check mockgen
@@ -144,7 +144,7 @@ check_mockgen() {
         echo "Error: mockgen is not installed."
         return 1
     fi
-    echo "✓ mockgen is installed"
+    echo "OK: mockgen is installed"
     return 0
 }
 
@@ -152,7 +152,7 @@ check_mockgen() {
 install_mockgen() {
     echo "Installing mockgen..."
     go install go.uber.org/mock/mockgen@latest > /dev/null 2>&1
-    echo "✓ mockgen installed"
+    echo "OK: mockgen installed"
 }
 
 # Function to check gotestsum
@@ -161,7 +161,7 @@ check_gotestsum() {
         echo "Error: gotestsum is not installed."
         return 1
     fi
-    echo "✓ gotestsum is installed"
+    echo "OK: gotestsum is installed"
     return 0
 }
 
@@ -169,16 +169,16 @@ check_gotestsum() {
 install_gotestsum() {
     echo "Installing gotestsum..."
     go install gotest.tools/gotestsum@latest > /dev/null 2>&1
-    echo "✓ gotestsum installed"
+    echo "OK: gotestsum installed"
 }
 
 # Function to check docker
 check_docker() {
     if ! command_exists docker; then
-        echo "⚠ Warning: docker is not installed. Docker is required for local full run with docker compose."
+        echo "Warning: docker is not installed. Docker is required for local full run with docker compose."
         return 1
     else
-        echo "✓ docker is installed"
+        echo "OK: docker is installed"
         return 0
     fi
 }
@@ -186,10 +186,10 @@ check_docker() {
 # Function to check docker-compose
 check_docker_compose() {
     if ! command_exists docker-compose && ! docker compose version &> /dev/null 2>&1; then
-        echo "⚠ Warning: docker-compose is not installed. Docker Compose is required for local full run with docker compose."
+        echo "Warning: docker-compose is not installed. Docker Compose is required for local full run with docker compose."
         return 1
     else
-        echo "✓ docker-compose is available"
+        echo "OK: docker-compose is available"
         return 0
     fi
 }
@@ -199,7 +199,7 @@ download_go_dependencies() {
     echo "Downloading Go dependencies..."
     go mod download > /dev/null 2>&1
     go mod tidy > /dev/null 2>&1
-    echo "✓ Go dependencies downloaded"
+    echo "OK: Go dependencies downloaded"
 }
 
 # Function to configure git hooks
@@ -209,9 +209,9 @@ configure_git_hooks() {
         CURRENT_HOOKS_PATH=$(git config --get core.hooksPath 2>/dev/null || echo "")
         if [ "$CURRENT_HOOKS_PATH" != "$GITHOOKS_DIR" ]; then
             git config core.hooksPath "$GITHOOKS_DIR"
-            echo "✓ Git hooks configured to use .githooks directory"
+            echo "OK: Git hooks configured to use .githooks directory"
         else
-            echo "✓ Git hooks already configured"
+            echo "OK: Git hooks already configured"
         fi
     fi
 }
@@ -286,7 +286,7 @@ init_dev() {
     fi
     
     if [ $TOOLS_MISSING -gt 0 ]; then
-        echo "⚠ Warning: $TOOLS_MISSING required tool(s) are missing. Some targets may not work."
+        echo "Warning: $TOOLS_MISSING required tool(s) are missing. Some targets may not work."
     fi
 }
 

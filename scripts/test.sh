@@ -49,21 +49,21 @@ echo ""
 
 # Generate coverage summary
 if [ -f "$COVERAGE_PROFILE" ]; then
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "----------------------------------------------------------------------------"
     echo "Coverage Report"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "----------------------------------------------------------------------------"
     echo ""
-    
+
     # Show per-package coverage summary
     echo "Package Coverage:"
-    echo "────────────────────────────────────────────────────────────────────────────"
+    echo "----------------------------------------------------------------------------"
     go tool cover -func="$COVERAGE_PROFILE" | grep -E "^real-time-activity-feed" | awk '
     {
         # Extract package name (remove "real-time-activity-feed/" prefix and file path)
         pkg = $1
         gsub(/^real-time-activity-feed\//, "", pkg)
         gsub(/\/[^/]+\.go.*$/, "", pkg)
-        
+
         # Extract coverage percentage
         match($0, /([0-9.]+)%$/, arr)
         if (arr[1] != "") {
@@ -81,36 +81,34 @@ if [ -f "$COVERAGE_PROFILE" ]; then
         # Print packages with average coverage
         for (pkg in pkg_count) {
             avg = pkg_total[pkg] / pkg_count[pkg]
-            printf "  ✓ %-50s %6.1f%%\n", pkg, avg
+            printf "  OK: %-50s %6.1f%%\n", pkg, avg
         }
     }' | sort
-    
-    echo "────────────────────────────────────────────────────────────────────────────"
-    
+
+    echo "----------------------------------------------------------------------------"
+
     # Show overall coverage
     OVERALL_COV=$(go tool cover -func="$COVERAGE_PROFILE" 2>/dev/null | grep "total:" | awk '{print $3}' || echo "N/A")
     if [ "$OVERALL_COV" != "N/A" ]; then
         echo ""
         echo "  Overall Coverage: $OVERALL_COV"
     fi
-    
+
     echo ""
-    
+
     # Generate HTML coverage report
     echo "Generating HTML coverage report..."
     go tool cover -html="$COVERAGE_PROFILE" -o "$COVERAGE_HTML" > /dev/null 2>&1 || true
-    
+
     if [ -f "$COVERAGE_HTML" ]; then
-        echo "✓ Coverage report generated: $COVERAGE_HTML"
+        echo "OK: Coverage report generated: $COVERAGE_HTML"
     fi
-    
+
     if [ -f "$JUNIT_XML" ]; then
-        echo "✓ JUnit XML report generated: $JUNIT_XML"
+        echo "OK: JUnit XML report generated: $JUNIT_XML"
         echo "  (for GitHub Actions integration)"
     fi
 fi
 
 echo ""
 echo "Unit tests completed successfully"
-
-
