@@ -3,7 +3,7 @@
 # Run unit tests and generate coverage report using gotestsum
 # Usage: ./scripts/test.sh
 
-set -e
+set -eo pipefail
 
 # Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -43,7 +43,7 @@ gotestsum \
     -- \
     -coverprofile="$COVERAGE_PROFILE" \
     -covermode=atomic \
-    ./cmd/... ./internal/... 2>&1 | grep -v "^compile:" || true
+    ./cmd/... ./internal/... 2>&1 | grep -v "^compile:"
 
 echo ""
 
